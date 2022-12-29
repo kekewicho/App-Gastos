@@ -15,7 +15,7 @@ actual=''
 class Content(MDBoxLayout):
 	pass
 
-class Scr(ScreenManager):
+class Scr(MDBoxLayout):
 	def validacion(self,field,text):
 		if field=='monto':
 			return text.isnumeric()
