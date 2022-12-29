@@ -22,92 +22,113 @@
         on_text: self.error=False
 
 <Scr>:
-	transition:WipeTransition()
-	Screen:
-		name: 'ingre_egre'
-		MDFloatLayout:
-			md_bg_color:1,1,1,1
-			MDBoxLayout:
-				size_hint_x:.9
-				orientation:'vertical'
-				pos_hint:{'center_x':.5,'center_y':.5}
-				spacing:50
-				MDLabel:
-					text:'Ingresos y egresos'
-					halign:'center'
-					size_hint_y:.1
-				MDBoxLayout:
-					size_hint_y:.08
-					id:slotquince
-					MDIconButton:
-						icon:"chevron-left"
-						on_release:root.trasladar_quincena('previous')
-					MDLabel:
-						id:quincena
-						halign:'center'
-						valign:'center'
-						text:'[QUINCENA ACTUAL]'
-					MDIconButton:
-						icon:'chevron-right'
-						on_release:root.trasladar_quincena('next')
-				MDLabel:
-					bold:True
-					halign:'center'
-					size_hint_y:.1
-					text:'Balance: '
-					id:balance
-					font_size:sp(20)
-					theme_text_color: "Custom"
-	    			text_color: "red" if '-' in self.text else 'black'
-				MDBoxLayout:
-					size_hint_y:.1
-					MDFloatLayout:
-					MDFillRoundFlatIconButton:
-						text:'Ingreso'
-						icon:'cash-plus'
-						md_bg_color:'#086001'
-						on_release:root.registro('ingresos')
-					MDFloatLayout:
-						size_hint_x:.5
-					MDFillRoundFlatIconButton:
-						text:'Egreso'
-						icon:'cash-remove'
-						md_bg_color:'#7d0204'
-						on_release:root.registro('egresos')
-					MDFloatLayout:
-				MDBoxLayout:
-					spacing:15
-					MDBoxLayout:
-						orientation:'vertical'
-						MDLabel:
-							text:'Ingresos'
-							halign:'center'
-							size_hint_y:.1
-						ScrollView:
-							MDList:
-								id:ingresos
-					MDBoxLayout:
-						orientation:'vertical'
-						MDLabel:
-							text:'Egresos'
-							halign:'center'
-							size_hint_y:.1
-						ScrollView:
-							MDList:
-								id:egresos
+	MDNavigationLayout:
+		ScreenManager:
+			id:scr_manager
+			transition:WipeTransition()
+			Screen:
+				name: 'ingre_egre'
 				MDFloatLayout:
-					size_hint_y:.1
-			MDFloatingActionButton:
-				icon: 'sack' if root.current=='ingre_egre' else 'cash-multiple'
-				pos_hint:{'right':.9,'center_y':.1}
-				on_release:root.current='fondo'
-	Screen:
-		name: 'fondo'
-		MDFloatLayout:
-			md_bg_color:1,1,1,1
-			MDLabel:
-				text:'Fondo'
-			MDFloatingActionButton:
-				icon: 'sack' if root.current=='ingre_egre' else 'cash-multiple'
-				pos_hint:{'right':.9,'center_y':.1}
-				on_release:root.current='ingre_egre'
+					md_bg_color:1,1,1,1
+					MDBoxLayout:
+						size_hint_x:.9
+						orientation:'vertical'
+						pos_hint:{'center_x':.5,'center_y':.5}
+						spacing:50
+						MDLabel:
+							text:'Ingresos y egresos'
+							halign:'center'
+							size_hint_y:.1
+						MDBoxLayout:
+							size_hint_y:.08
+							id:slotquince
+							MDIconButton:
+								icon:"chevron-left"
+								on_release:root.trasladar_quincena('previous')
+							MDLabel:
+								id:quincena
+								halign:'center'
+								valign:'center'
+								text:'[QUINCENA ACTUAL]'
+							MDIconButton:
+								icon:'chevron-right'
+								on_release:root.trasladar_quincena('next')
+						MDLabel:
+							bold:True
+							halign:'center'
+							size_hint_y:.1
+							text:'Balance: '
+							id:balance
+							font_size:sp(20)
+							theme_text_color: "Custom"
+							text_color: "red" if '-' in self.text else 'black'
+						MDBoxLayout:
+							size_hint_y:.1
+							MDFloatLayout:
+							MDFillRoundFlatIconButton:
+								text:'Ingreso'
+								icon:'cash-plus'
+								md_bg_color:'#086001'
+								on_release:root.registro('ingresos')
+							MDFloatLayout:
+								size_hint_x:.5
+							MDFillRoundFlatIconButton:
+								text:'Egreso'
+								icon:'cash-remove'
+								md_bg_color:'#7d0204'
+								on_release:root.registro('egresos')
+							MDFloatLayout:
+						MDBoxLayout:
+							spacing:15
+							MDBoxLayout:
+								orientation:'vertical'
+								MDLabel:
+									text:'Ingresos'
+									halign:'center'
+									size_hint_y:.1
+								ScrollView:
+									MDList:
+										id:ingresos
+							MDBoxLayout:
+								orientation:'vertical'
+								MDLabel:
+									text:'Egresos'
+									halign:'center'
+									size_hint_y:.1
+								ScrollView:
+									MDList:
+										id:egresos
+						MDFloatLayout:
+							size_hint_y:.1
+			Screen:
+				name: 'fondo'
+				MDFloatLayout:
+					md_bg_color:1,1,1,1
+					MDLabel:
+						text:'Fondo'
+		MDNavigationDrawer:
+			id:nav_drawer
+			MDBoxLayout:
+				orientation:'vertical'
+				MDRectangleFlatIconButton:
+					icon: "sack"
+					text: "Ahorros"
+					theme_text_color: "Custom"
+					text_color: "black"
+					line_color: "white"
+					theme_icon_color: "Custom"
+					icon_color: "black"
+					on_release:
+						nav_drawer.set_state('close')
+						scr_manager.current='fondo'
+				MDRectangleFlatIconButton:
+					icon: "cash-multiple"
+					text: "Cuentas quincenales"
+					theme_text_color: "Custom"
+					text_color: "black"
+					line_color: "white"
+					theme_icon_color: "Custom"
+					icon_color: "black"
+					on_release:
+						nav_drawer.set_state('close')
+						scr_manager.current='ingre_egre'
