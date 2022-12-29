@@ -1,3 +1,4 @@
+#:import WipeTransition kivy.uix.screenmanager.WipeTransition
 <Content>
     orientation: "vertical"
     spacing: "12dp"
@@ -21,9 +22,11 @@
         on_text: self.error=False
 
 <Scr>:
+	transition:WipeTransition()
 	Screen:
 		name: 'ingre_egre'
 		MDFloatLayout:
+			md_bg_color:1,1,1,1
 			MDBoxLayout:
 				size_hint_x:.9
 				orientation:'vertical'
@@ -80,7 +83,7 @@
 							text:'Ingresos'
 							halign:'center'
 							size_hint_y:.1
-						ScrollView
+						ScrollView:
 							MDList:
 								id:ingresos
 					MDBoxLayout:
@@ -89,13 +92,22 @@
 							text:'Egresos'
 							halign:'center'
 							size_hint_y:.1
-						ScrollView
+						ScrollView:
 							MDList:
 								id:egresos
 				MDFloatLayout:
 					size_hint_y:.1
+			MDFloatingActionButton:
+				icon: 'sack' if root.current=='ingre_egre' else 'cash-multiple'
+				pos_hint:{'right':.9,'center_y':.1}
+				on_release:root.current='fondo'
 	Screen:
 		name: 'fondo'
 		MDFloatLayout:
+			md_bg_color:1,1,1,1
 			MDLabel:
 				text:'Fondo'
+			MDFloatingActionButton:
+				icon: 'sack' if root.current=='ingre_egre' else 'cash-multiple'
+				pos_hint:{'right':.9,'center_y':.1}
+				on_release:root.current='ingre_egre'

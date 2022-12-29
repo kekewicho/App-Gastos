@@ -95,14 +95,16 @@ class Appson(MDApp):
 		self.root.ids.quincena.text=quincena_actual
 		for operation in ('ingresos','egresos'):
 			data=crud.db.child('ingre_egre').child(actual).child(operation).get()
-
-			for value in data.each():
-				if operation=='ingresos':
-					balance+=eval(value.val()['monto'])
-					self.root.ids.ingresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
-				elif operation=='egresos':
-					balance-=eval(value.val()['monto'])
-					self.root.ids.egresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+			if data.each() is None:
+				pass
+			else:
+				for value in data.each():
+					if operation=='ingresos':
+						balance+=eval(value.val()['monto'])
+						self.root.ids.ingresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+					elif operation=='egresos':
+						balance-=eval(value.val()['monto'])
+						self.root.ids.egresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
 		
 if __name__=="__main__":
