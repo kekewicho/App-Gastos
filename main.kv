@@ -102,15 +102,34 @@
 							size_hint_y:.1
 			Screen:
 				name: 'fondo'
-				MDFloatLayout:
-					md_bg_color:1,1,1,1
-					MDLabel:
-						text:'Fondo'
+				on_enter:root.populate_fondo()
+				ScrollView:
+					MDGridLayout:
+						row_default_height:100
+						adaptive_height:True
+						cols:1
+						id:layout_fondo
+						padding:15
+						spacing:20
+						MDLabel:
+							bold:True
+							halign:'center'
+							size_hint_y:.1
+							text:'Total Ahorros: '
+							id:ahorrado
+							font_size:sp(20)
+							theme_text_color: "Custom"
+							text_color: "red" if '-' in self.text else 'black'
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
 				orientation:'vertical'
+				MDFloatLayout:
+					size_hint_y:.1
 				MDRectangleFlatIconButton:
+					font_size:sp(20)
+					halign:'left'
+					size_hint_x:1
 					icon: "sack"
 					text: "Ahorros"
 					theme_text_color: "Custom"
@@ -122,6 +141,9 @@
 						nav_drawer.set_state('close')
 						scr_manager.current='fondo'
 				MDRectangleFlatIconButton:
+					font_size:sp(20)
+					halign:'left'
+					size_hint_x:1
 					icon: "cash-multiple"
 					text: "Cuentas quincenales"
 					theme_text_color: "Custom"
@@ -132,3 +154,4 @@
 					on_release:
 						nav_drawer.set_state('close')
 						scr_manager.current='ingre_egre'
+				MDFloatLayout:

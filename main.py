@@ -6,20 +6,65 @@ from kivy.uix.screenmanager import ScreenManager,Screen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import TwoLineListItem
 from kivy.animation import Animation
+from kivymd.uix.label import MDLabel
+from kivymd.uix.card import MDCard
 import datetime
 import crud
 
 balance=0
 actual=''
+ahorro=0
 
 class Content(MDBoxLayout):
 	pass
 
 class Scr(MDBoxLayout):
+	def populate_fondo(self):
+		ahorro=0
+		tarjeta=crud.db.child('fondo').child('tarjeta').get()
+		prestamos=crud.db.child('fondo').child('prestamos').get()
+		lo=MDBoxLayout(padding=15,orientation='vertical')
+		card=MDCard(elevation=2)
+		monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),bold=True,font_size='15')
+		nombre=MDLabel(text='En tarjeta del banco',bold=True,font_size='17')
+		lo.add_widget(nombre)
+		lo.add_widget(monto)
+		card.add_widget(lo)
+		self.ids.layout_fondo.add_widget(card)
+		ahorro+=tarjeta.val()
+		
+		for i in prestamos.each():
+			saldo=0
+			for j in ('ingresos','egresos'):
+				op=crud.db.child('fondo').child('prestamos').child(i.key()).child(j).get()
+				for h in op.each():
+					if j=='ingresos':saldo+=eval(h.val()['monto'])
+				else: saldo-=eval(h.val()['monto'])
+			
+			lo=MDBoxLayout(padding=15,orientation='vertical')
+			card=MDCard(elevation=2)
+			monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(saldo),bold=True,font_size='15')
+			nombre=MDLabel(text='Prestamo '+i.key(),bold=True,font_size='17')
+			lo.add_widget(nombre)
+			lo.add_widget(monto)
+			card.add_widget(lo)
+			self.ids.layout_fondo.add_widget(card)
+			ahorro+=saldo
+
+		self.ids.ahorrado.text+="${:,.2f}".format(ahorro)
+
+		
 	def validacion(self,field,text):
 		if field=='monto':
-			return text.isnumeric()
-		if field=='descripcion':
+			if '.' in text:
+				try:
+					float(text)
+					return True
+				except ValueError:
+					return False
+			else:
+				return text.isnumeric()
+		elif field=='descripcion':
 			if not text=='':return True
 			else: False
 	
