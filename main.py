@@ -24,7 +24,7 @@ class Scr(MDBoxLayout):
 		tarjeta=crud.db.child('fondo').child('tarjeta').get()
 		prestamos=crud.db.child('fondo').child('prestamos').get()
 		lo=MDBoxLayout(padding=15,orientation='vertical')
-		card=MDCard(elevation=2)
+		card=MDCard(elevation=2,size_hint_y=None,height=50)
 		monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),bold=True,font_size='15')
 		nombre=MDLabel(text='En tarjeta del banco',bold=True,font_size='17')
 		lo.add_widget(nombre)
@@ -42,7 +42,7 @@ class Scr(MDBoxLayout):
 				else: saldo-=eval(h.val()['monto'])
 			
 			lo=MDBoxLayout(padding=15,orientation='vertical')
-			card=MDCard(elevation=2)
+			card=MDCard(elevation=2,size_hint_y=None,height=100)
 			monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(saldo),bold=True,font_size='15')
 			nombre=MDLabel(text='Prestamo '+i.key(),bold=True,font_size='17')
 			lo.add_widget(nombre)
