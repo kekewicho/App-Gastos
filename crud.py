@@ -71,3 +71,4 @@ def translate_codigo(codigo=quince_actual('new')):
 	
 	trans=quincena+'era de '+mes+' del '+año
 	return trans
+
