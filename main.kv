@@ -105,7 +105,7 @@
 				on_enter:root.populate_fondo()
 				ScrollView:
 					MDGridLayout:
-						row_default_height:100
+						row_default_height:10
 						adaptive_height:True
 						cols:1
 						id:layout_fondo
@@ -114,12 +114,19 @@
 						MDLabel:
 							bold:True
 							halign:'center'
-							size_hint_y:.1
 							text:'Total Ahorros: '
 							id:ahorrado
 							font_size:sp(20)
 							theme_text_color: "Custom"
 							text_color: "red" if '-' in self.text else 'black'
+							size_hint_y:None
+							height:120
+							adaptive_height: True
+						MDFillRoundFlatIconButton:
+							text:'Ingreso'
+							icon:'cash-plus'
+							md_bg_color:'#086001'
+							on_release:print('hola')
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
