@@ -1,4 +1,29 @@
 #:import WipeTransition kivy.uix.screenmanager.WipeTransition
+<Buttons>:
+	padding:2
+	spacing:2
+	size_hint_y:None
+	height:60
+	MDFloatLayout:
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Ingreso'
+			icon:'cash-plus'
+			md_bg_color:'#086001'
+			on_release:root.registro('ingreso')
+	MDFloatLayout:
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Egreso'
+			icon:'cash-remove'
+			md_bg_color:'#7d0204'
+			on_release:root.registro('egreso')
+	MDFloatLayout:
+
 <Content>
     orientation: "vertical"
     spacing: "12dp"
@@ -30,14 +55,16 @@
 				name: 'ingre_egre'
 				MDFloatLayout:
 					md_bg_color:1,1,1,1
+					MDIconButton:
+						icon:'menu'
+						pos_hint:{'x':.05,'top':1}
+						on_release:nav_drawer.set_state('open')
 					MDBoxLayout:
 						size_hint_x:.9
 						orientation:'vertical'
 						pos_hint:{'center_x':.5,'center_y':.5}
 						spacing:50
-						MDLabel:
-							text:'Ingresos y egresos'
-							halign:'center'
+						MDFloatLayout:
 							size_hint_y:.1
 						MDBoxLayout:
 							size_hint_y:.08
@@ -102,37 +129,40 @@
 							size_hint_y:.1
 			Screen:
 				name: 'fondo'
-				on_enter:root.populate_fondo()
-				ScrollView:
-					MDGridLayout:
-						row_default_height:10
-						adaptive_height:True
-						cols:1
-						id:layout_fondo
-						padding:15
-						spacing:20
-						MDLabel:
-							bold:True
-							halign:'center'
-							text:'Total Ahorros: '
-							id:ahorrado
-							font_size:sp(20)
-							theme_text_color: "Custom"
-							text_color: "red" if '-' in self.text else 'black'
-							size_hint_y:None
-							height:120
-							adaptive_height: True
-						MDFillRoundFlatIconButton:
-							text:'Ingreso'
-							icon:'cash-plus'
-							md_bg_color:'#086001'
-							on_release:print('hola')
+				MDFloatLayout:
+					MDIconButton:
+						icon:'menu'
+						pos_hint:{'x':.05,'top':1}
+						on_release:nav_drawer.set_state('open')
+					ScrollView:
+						MDGridLayout:
+							row_default_height:10
+							adaptive_height:True
+							cols:1
+							id:layout_fondo
+							padding:15
+							spacing:20
+							MDAnchorLayout:
+								anchor_x:'center'
+								anchor_y:'center'
+								size_hint_y:None
+								height:50
+								MDLabel:
+									bold:True
+									halign:'center'
+									text:'Total Ahorros: '
+									id:ahorrado
+									font_size:sp(20)
+									theme_text_color: "Custom"
+									text_color: "red" if '-' in self.text else 'black'
+									size_hint_y:None
+									adaptive_height: True
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
 				orientation:'vertical'
 				MDFloatLayout:
-					size_hint_y:.1
+					size_hint_y:.05
 				MDRectangleFlatIconButton:
 					font_size:sp(20)
 					halign:'left'
