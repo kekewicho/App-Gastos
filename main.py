@@ -1,3 +1,4 @@
+import weakref
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
@@ -8,13 +9,25 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.label import MDLabel
 from kivymd.uix.card import MDCard
 from kivy.animation import Animation
+from kivymd.uix.expansionpanel import MDExpansionPanel,MDExpansionPanelTwoLine
 import crud
 
 balance=0
 actual=''
 ahorro=0
 prestamo_selected=''
-opened_card=[]
+cards_init=['tarjeta']
+buttons_init=[]
+
+class Cards(MDCard):
+	def releasing(self):
+		global cards_init,prestamo_selected,buttons_init
+		prestamo_selected=str(self.id).replace('_',' ')
+		self.add_widget(Buttons())
+		buttons_init.append(str(self.children))
+		anim=Animation(height=130,duration=.2)
+		anim.start(self)
+		print
 
 class Buttons(MDBoxLayout):
 	def registro(self,operation):
@@ -24,7 +37,7 @@ class Buttons(MDBoxLayout):
 		
 		def registrar(object):
 			global prestamo_selected
-			print(prestamo_selected)
+			print(prestamo_selected.replace(' ','_'))
 		
 		def cancelar(object):
 			clean_fields()
@@ -44,6 +57,17 @@ class Content(MDBoxLayout):
 	pass
 
 class Scr(MDBoxLayout):
+	def collapse_ahorro(self):
+		global cards_init
+		for i in self.ids:
+			if i in cards_init:
+				print(i)
+				anim=Animation(height=100,duration=.2)
+				anim.start(eval('self.ids.'+i))
+			if i in buttons_init:
+				print(i)
+				eval('self.ids.remove_widget('+i+')')
+
 	def validacion(self,field,text):
 		if field=='monto':
 			if '.' in text:
@@ -123,23 +147,8 @@ class Appson(MDApp):
 		return Scr()
 	
 	def on_start(self):
-		def press_card(self):
-			global prestamo_selected,opened_card
-			if self.height==130:
-				self.clear_widgets()
-				anim=Animation(height=100,duration=.2)
-				anim.start(self)
-				monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),bold=True,font_size='15')
-				nombre=MDLabel(text='En tarjeta del banco',bold=True,font_size='17')
-				self.add_widget(nombre)
-				self.add_widget(monto)
-			else:
-				self.add_widget(Buttons())
-				anim=Animation(height=130,duration=.2)
-				anim.start(self)
-				prestamo_selected=str(self.id).replace('_',' ')
-				opened_card.append(self.id)
-
+		def open(self):
+			print('hola')
 
 		#construyendo la pagina de las cuentas quincenales
 		global balance
@@ -165,21 +174,17 @@ class Appson(MDApp):
 		ahorro=0
 		tarjeta=crud.db.child('fondo').child('tarjeta').get()
 		prestamos=crud.db.child('fondo').child('prestamos').get()
-		lo=MDBoxLayout(padding=15,orientation='vertical',id='tarjeta')
-		card=MDCard(elevation=2,
-			size_hint_y=None,
-			height=100,
-			ripple_behavior=True,
-			orientation='vertical',
-			id='tarjeta',
-			padding=15
-			)
-		monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),bold=True,font_size='15')
-		nombre=MDLabel(text='En tarjeta del banco',bold=True,font_size='17')
-		card.add_widget(nombre)
-		card.add_widget(monto)
+		card=Cards()
+		panel=MDExpansionPanel(
+			content=Buttons(),
+			panel_cls=MDExpansionPanelTwoLine(
+				text='En tarjeta del banco',
+				secondary_text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),
+        		)
+    	)
+		card.add_widget(panel)
 		self.root.ids.layout_fondo.add_widget(card)
-		card.bind(on_release=press_card)
+		self.root.ids['tarjeta'] = weakref.ref(panel)
 		ahorro+=tarjeta.val()
 		
 		for i in prestamos.each():
@@ -191,23 +196,18 @@ class Appson(MDApp):
 				else: saldo-=eval(h.val()['monto'])
 			
 			_prestamo=i.key()
-			card=MDCard(elevation=2,
-				size_hint_y=None,
-				height=100,
-				ripple_behavior=True,
-				orientation='vertical',
-				id=_prestamo.replace(' ','_'),
-				padding=15
-				)
+			card=Cards()
 			monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(saldo),bold=True,font_size='15')
 			nombre=MDLabel(text='Prestamo '+i.key(),bold=True,font_size='17')
 			card.add_widget(nombre)
 			card.add_widget(monto)
 			self.root.ids.layout_fondo.add_widget(card)
-			card.bind(on_release=press_card)
+			self.root.ids[_prestamo.replace(' ','_')] = weakref.ref(card)
 			ahorro+=saldo
+			cards_init.append(_prestamo.replace(' ','_'))
 
 		self.root.ids.ahorrado.text+="${:,.2f}".format(ahorro)
+
 
 		
 if __name__=="__main__":
