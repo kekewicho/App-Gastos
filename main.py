@@ -19,16 +19,6 @@ prestamo_selected=''
 cards_init=['tarjeta']
 buttons_init=[]
 
-class Cards(MDCard):
-	def releasing(self):
-		global cards_init,prestamo_selected,buttons_init
-		prestamo_selected=str(self.id).replace('_',' ')
-		self.add_widget(Buttons())
-		buttons_init.append(str(self.children))
-		anim=Animation(height=130,duration=.2)
-		anim.start(self)
-		print
-
 class Buttons(MDBoxLayout):
 	def registro(self,operation):
 		def clean_fields():
@@ -37,37 +27,23 @@ class Buttons(MDBoxLayout):
 		
 		def registrar(object):
 			global prestamo_selected
-			print(prestamo_selected.replace(' ','_'))
+			print(prestamo_selected)
 		
 		def cancelar(object):
 			clean_fields()
 			self.dialog.dismiss()
 		
-		self.dialog=MDDialog(
-				title='Registrar '+operation,
-				type='custom',
-				content_cls=Content(),
-				buttons=[
-					bt(text='Cancelar',on_release=cancelar),
-					bt(text='Registrar',on_release=registrar)]
-			)
-		self.dialog.open()
+		for i in MDApp.root.ids:
+			print(i)
+
+
+class Cards(MDCard):
+	pass
 
 class Content(MDBoxLayout):
 	pass
 
 class Scr(MDBoxLayout):
-	def collapse_ahorro(self):
-		global cards_init
-		for i in self.ids:
-			if i in cards_init:
-				print(i)
-				anim=Animation(height=100,duration=.2)
-				anim.start(eval('self.ids.'+i))
-			if i in buttons_init:
-				print(i)
-				eval('self.ids.remove_widget('+i+')')
-
 	def validacion(self,field,text):
 		if field=='monto':
 			if '.' in text:
@@ -147,9 +123,6 @@ class Appson(MDApp):
 		return Scr()
 	
 	def on_start(self):
-		def open(self):
-			print('hola')
-
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
@@ -171,44 +144,24 @@ class Appson(MDApp):
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
 
 		#construyendo la pagina de ahorros
-		ahorro=0
-		tarjeta=crud.db.child('fondo').child('tarjeta').get()
-		prestamos=crud.db.child('fondo').child('prestamos').get()
-		card=Cards()
-		panel=MDExpansionPanel(
-			content=Buttons(),
-			panel_cls=MDExpansionPanelTwoLine(
-				text='En tarjeta del banco',
-				secondary_text='En esta cuenta:'+"${:,.2f}".format(tarjeta.val()),
-        		)
-    	)
-		card.add_widget(panel)
-		self.root.ids.layout_fondo.add_widget(card)
-		self.root.ids['tarjeta'] = weakref.ref(panel)
-		ahorro+=tarjeta.val()
-		
-		for i in prestamos.each():
-			saldo=0
-			for j in ('ingresos','egresos'):
-				op=crud.db.child('fondo').child('prestamos').child(i.key()).child(j).get()
-				for h in op.each():
-					if j=='ingresos':saldo+=eval(h.val()['monto'])
-				else: saldo-=eval(h.val()['monto'])
-			
-			_prestamo=i.key()
+		for i in range(19):
 			card=Cards()
-			monto=MDLabel(text='En esta cuenta:'+"${:,.2f}".format(saldo),bold=True,font_size='15')
-			nombre=MDLabel(text='Prestamo '+i.key(),bold=True,font_size='17')
-			card.add_widget(nombre)
-			card.add_widget(monto)
+			content = Buttons()
+			card.add_widget(
+				MDExpansionPanel(
+					content=content,
+					panel_cls=MDExpansionPanelTwoLine(text=f"{i}",secondary_text='descripcion'),
+				)
+			)
 			self.root.ids.layout_fondo.add_widget(card)
-			self.root.ids[_prestamo.replace(' ','_')] = weakref.ref(card)
-			ahorro+=saldo
-			cards_init.append(_prestamo.replace(' ','_'))
-
-		self.root.ids.ahorrado.text+="${:,.2f}".format(ahorro)
-
-
+	
+	def prueba(self):
+		for i in self.root.ids.layout_fondo.children:
+			try:
+				if i.children[-1].height>130:print(f'Sleccionado: {i.children[-1].panel_cls.text}')
+			except:
+				pass
+	
 		
 if __name__=="__main__":
 	Appson().run()

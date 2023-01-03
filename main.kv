@@ -1,17 +1,17 @@
 #:import WipeTransition kivy.uix.screenmanager.WipeTransition
 <Cards>:
-	padding:15
-	spacing:2
-	size_hint_y:None
-	orientation:'vertical'
 	elevation:2
+	orientation: "vertical"
+	size_hint: .6, None
+	height: self.minimum_height
+	pos_hint: {"center_x": .5, "center_y": .5}
+	padding:10
 
 <Buttons>:
 	padding:2
-	spacing:2
+	spacing:15
 	size_hint_y:None
 	height:60
-	MDFloatLayout:
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -19,9 +19,7 @@
 			text:'Ingreso'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:
-				root.registro('ingreso')
-	MDFloatLayout:
+			on_release:app.prueba()
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -29,8 +27,7 @@
 			text:'Egreso'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:root.registro('egreso')
-	MDFloatLayout:
+			on_release:app.prueba()
 
 <Content>
     orientation: "vertical"
