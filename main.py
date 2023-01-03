@@ -16,8 +16,7 @@ balance=0
 actual=''
 ahorro=0
 prestamo_selected=''
-cards_init=['tarjeta']
-buttons_init=[]
+
 
 class Buttons(MDBoxLayout):
 	def registro(self,operation):
@@ -35,11 +34,16 @@ class Buttons(MDBoxLayout):
 		
 		for i in MDApp.root.ids:
 			print(i)
-
+	
+	def mov_fondo(self,operation,target):
+		if 'tarjeta' in target:
+			print(f'Se haría un {operation} en tarjeta')
+		else:
+			target=target.replace('Prestamo ','')
+			print(f'Se haría un {operation} en {target}')
 
 class Cards(MDCard):
 	pass
-
 class Content(MDBoxLayout):
 	pass
 
@@ -144,24 +148,38 @@ class Appson(MDApp):
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
 
 		#construyendo la pagina de ahorros
-		for i in range(19):
+		global ahorro
+		tarjeta=crud.db.child('fondo').child('tarjeta').get()
+		prestamos=crud.db.child('fondo').child('prestamos').get()
+		ahorro+=eval(tarjeta.val())
+		card=Cards()
+		content = Buttons()
+		card.add_widget(
+			MDExpansionPanel(
+				content=content,
+				panel_cls=MDExpansionPanelTwoLine(text='En tarjeta del banco',secondary_text='En esta cuenta: '+"${:,.2f}".format(eval(tarjeta.val()))),
+			)
+		)
+		self.root.ids.layout_fondo.add_widget(card)
+
+		for i in prestamos.each():
+			saldo=0
+			for j in ('ingresos','egresos'):
+				op=crud.db.child('fondo').child('prestamos').child(i.key()).child(j).get()
+				for h in op.each():
+					if j=='ingresos':saldo+=eval(h.val()['monto'])
+				else: saldo-=eval(h.val()['monto'])
+
 			card=Cards()
 			content = Buttons()
 			card.add_widget(
 				MDExpansionPanel(
-					content=content,
-					panel_cls=MDExpansionPanelTwoLine(text=f"{i}",secondary_text='descripcion'),
-				)
+				content=content,
+				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo),
 			)
+			))
 			self.root.ids.layout_fondo.add_widget(card)
-	
-	def prueba(self):
-		for i in self.root.ids.layout_fondo.children:
-			try:
-				if i.children[-1].height>130:print(f'Sleccionado: {i.children[-1].panel_cls.text}')
-			except:
-				pass
-	
-		
+
+
 if __name__=="__main__":
 	Appson().run()
