@@ -19,7 +19,7 @@
 			text:'Ingreso'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:app.prueba()
+			on_release:root.mov_fondo('ingresos',root.parent.panel_cls.text)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -27,7 +27,7 @@
 			text:'Egreso'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:app.prueba()
+			on_release:root.mov_fondo('egresos',root.parent.panel_cls.text)
 
 <Content>
     orientation: "vertical"
