@@ -19,7 +19,7 @@
 			text:'Ingreso'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:root.mov_fondo('ingresos',root.parent.panel_cls.text)
+			on_release:root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.mov_fondo('ingresos',root.parent.parent.parent)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -27,7 +27,7 @@
 			text:'Egreso'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:root.mov_fondo('egresos',root.parent.panel_cls.text)
+			on_release:root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.mov_fondo('egresos',root.parent.parent.parent)
 
 <Content>
     orientation: "vertical"
@@ -46,7 +46,7 @@
     MDTextField:
         id: descripcion
         error: False
-        hint_text: "Descripción"
+        hint_text: "Descripción" if app.root.ids.scr_manager.current=='ingre_egre' else 'Fecha'
         helper_text_mode: "on_error"
         helper_text: "Ingresa un valor válido"
         on_text: self.error=False
