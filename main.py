@@ -17,6 +17,8 @@ actual=''
 ahorro=0
 prestamo_selected=''
 
+class ContentFondo(MDBoxLayout):
+	pass
 
 class Buttons(MDBoxLayout):
 	def registro(self,operation):
@@ -36,12 +38,13 @@ class Buttons(MDBoxLayout):
 			print(i)
 	
 	def mov_fondo(self,operation,target):
-		if 'tarjeta' in target:
+		'''if 'tarjeta' in target:
 			print(f'Se haría un {operation} en tarjeta')
 		else:
 			target=target.replace('Prestamo ','')
 			print(f'Se haría un {operation} en {target}')
-
+'''
+		print(target)
 class Cards(MDCard):
 	pass
 class Content(MDBoxLayout):
@@ -93,15 +96,15 @@ class Scr(MDBoxLayout):
 			global balance, actual
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
-			quincena=self.ids.quincena.text
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
-				crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
-				self.ids[operation].add_widget(TwoLineListItem(text='$'+self.dialog.content_cls.ids.monto.text,secondary_text=self.dialog.content_cls.ids.descripcion.text))
-				clean_fields()
-				if operation=='ingresos': balance+=eval(monto)
-				elif operation=='egresos': balance-=eval(monto)
-				self.ids.balance.text='Balance: '+"${:,.2f}".format(balance)
-				self.dialog.dismiss()
+
+					crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
+					self.ids[operation].add_widget(TwoLineListItem(text='$'+self.dialog.content_cls.ids.monto.text,secondary_text=self.dialog.content_cls.ids.descripcion.text))
+					clean_fields()
+					if operation=='ingresos': balance+=eval(monto)
+					elif operation=='egresos': balance-=eval(monto)
+					self.ids.balance.text='Balance: '+"${:,.2f}".format(balance)
+					self.dialog.dismiss()
 			else:
 				self.dialog.content_cls.ids.monto.error=True
 				self.dialog.content_cls.ids.descripcion.error=True
@@ -113,7 +116,7 @@ class Scr(MDBoxLayout):
 		self.dialog=MDDialog(
 				title='Registrar '+operation,
 				type='custom',
-				content_cls=Content(),
+				content_cls=Content() if self.parent.ids.scr_manager.current=='ingre_egre' else ContentFondo(),
 				buttons=[
 					bt(text='Cancelar',on_release=cancelar),
 					bt(text='Registrar',on_release=registrar)]
