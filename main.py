@@ -6,6 +6,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.card import MDCard
 from kivymd.uix.expansionpanel import MDExpansionPanel,MDExpansionPanelTwoLine
+from kivymd.uix.pickers import MDDatePicker
 import crud
 
 balance=0
@@ -37,25 +38,26 @@ class Buttons(MDBoxLayout):
 			self.dialog.content_cls.ids.descripcion.text=''
 		
 		def registrar(object):
-			global prestamos_list
+			global prestamos_list,ahorro
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
 
-			if self.validacion('monto',) and self.validacion('descripcion',descripcion):
+			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
+				ahorro+=eval(monto) if self.operation=='ingresos' else eval(monto)*-1
 				if 'tarjeta' in self.target:
-					if self.operation=='ingresos':saldo=prestamos_list['tarjeta']+eval(monto)
-					elif self.operation=='egresos':saldo=prestamos_list['tarjeta']-eval(monto)
-					crud.db.child('fondo').update({'tarjeta':saldo})
+					saldo=prestamos_list['tarjeta']+eval(monto) if self.operation=='ingresos' else prestamos_list['tarjeta']-eval(monto)
+					crud.db.child('fondo').update({'tarjeta':str(saldo)})
 					clean_fields()
-					self.parent.panel_cls.secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo)
 					prestamos_list['tarjeta']=saldo
-					self.parent.parent.parent.children[-1].children[0].text
 				else:
-					if self.operation=='ingresos':saldo=prestamos_list['tarjeta']+eval(monto)
-					elif self.operation=='egresos':saldo=prestamos_list['tarjeta']-eval(monto)
+					saldo=prestamos_list[self.target]+eval(monto) if self.operation=='ingresos' else prestamos_list[self.target]-eval(monto)
 					crud.db.child('fondo').child('prestamos').child(self.target).child(self.operation).push({'fecha':descripcion,'monto':monto})
 					clean_fields()
-		
+					prestamos_list[self.target]=saldo
+				self.parent.panel_cls.secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo)
+				self.parent.parent.parent.children[-1].children[0].text='Total ahorrado: '+"${:,.2f}".format(ahorro)
+				self.dialog.dismiss()
+
 		def cancelar(object):
 			clean_fields()
 			self.dialog.dismiss()
@@ -70,12 +72,22 @@ class Buttons(MDBoxLayout):
 			)
 		self.dialog.open()
 		self.operation=operation
-		self.target=target
+		self.target=target.replace('Prestamo ','')
+		self.dialog.content_cls.ids.descripcion.text=str(crud.datetime.date.today())
 
 class Cards(MDCard):
 	pass
 class Content(MDBoxLayout):
-	pass
+	def show_calendar(self):
+		date_dialog = MDDatePicker()
+		date_dialog.bind(on_save=self.on_save,on_cancel=self.on_cancel)
+		date_dialog.open()
+    
+	def on_save(self,instance,value,date_range):
+		self.children[0].text=value.strftime('%Y-%m-%d')
+
+	def on_cancel(self,instance,value):
+		pass
 
 class Scr(MDBoxLayout):
 	def validacion(self,field,text):
@@ -208,8 +220,10 @@ class Appson(MDApp):
 				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo),
 			)
 			))
+			ahorro+=saldo
 			self.root.ids.layout_fondo.add_widget(card)
 			prestamos_list[i.key()]=saldo
+		self.root.ids.ahorrado.text='Total ahorrado: '+"${:,.2f}".format(ahorro)
 
 
 if __name__=="__main__":
