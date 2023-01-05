@@ -1,10 +1,17 @@
 #:import WipeTransition kivy.uix.screenmanager.WipeTransition
+<Cards>:
+	elevation:2
+	orientation: "vertical"
+	size_hint: .6, None
+	height: self.minimum_height
+	pos_hint: {"center_x": .5, "center_y": .5}
+	padding:10
+
 <Buttons>:
 	padding:2
-	spacing:2
+	spacing:15
 	size_hint_y:None
 	height:60
-	MDFloatLayout:
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -12,8 +19,7 @@
 			text:'Ingreso'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:root.registro('ingreso')
-	MDFloatLayout:
+			on_release:app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -21,8 +27,7 @@
 			text:'Egreso'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:root.registro('egreso')
-	MDFloatLayout:
+			on_release:app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.parent)
 
 <Content>
     orientation: "vertical"
@@ -41,7 +46,7 @@
     MDTextField:
         id: descripcion
         error: False
-        hint_text: "Descripción"
+        hint_text: "Descripción" if app.root.ids.scr_manager.current=='ingre_egre' else 'Fecha'
         helper_text_mode: "on_error"
         helper_text: "Ingresa un valor válido"
         on_text: self.error=False
