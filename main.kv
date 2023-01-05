@@ -19,7 +19,7 @@
 			text:'Ingreso'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.mov_fondo('ingresos',root.parent.parent.parent)
+			on_release:app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -27,7 +27,7 @@
 			text:'Egreso'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.mov_fondo('egresos',root.parent.parent.parent)
+			on_release:app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.parent)
 
 <Content>
     orientation: "vertical"

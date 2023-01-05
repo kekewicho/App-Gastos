@@ -1,50 +1,77 @@
-import weakref
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton as bt
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.list import TwoLineListItem
-from kivymd.uix.label import MDLabel
 from kivymd.uix.card import MDCard
-from kivy.animation import Animation
 from kivymd.uix.expansionpanel import MDExpansionPanel,MDExpansionPanelTwoLine
 import crud
 
 balance=0
 actual=''
 ahorro=0
-prestamo_selected=''
+prestamos_list={}
 
 class ContentFondo(MDBoxLayout):
 	pass
 
 class Buttons(MDBoxLayout):
-	def registro(self,operation):
+	def validacion(self,field,text):
+		if field=='monto':
+			if '.' in text:
+				try:
+					float(text)
+					return True
+				except ValueError:
+					return False
+			else:
+				return text.isnumeric()
+		elif field=='descripcion':
+			if not text=='':return True
+			else: False
+	
+	def registro(self,operation,target):
 		def clean_fields():
 			self.dialog.content_cls.ids.monto.text=''
 			self.dialog.content_cls.ids.descripcion.text=''
 		
 		def registrar(object):
-			global prestamo_selected
-			print(prestamo_selected)
+			global prestamos_list
+			monto=self.dialog.content_cls.ids.monto.text
+			descripcion=self.dialog.content_cls.ids.descripcion.text
+
+			if self.validacion('monto',) and self.validacion('descripcion',descripcion):
+				if 'tarjeta' in self.target:
+					if self.operation=='ingresos':saldo=prestamos_list['tarjeta']+eval(monto)
+					elif self.operation=='egresos':saldo=prestamos_list['tarjeta']-eval(monto)
+					crud.db.child('fondo').update({'tarjeta':saldo})
+					clean_fields()
+					self.parent.panel_cls.secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo)
+					prestamos_list['tarjeta']=saldo
+					self.parent.parent.parent.children[-1].children[0].text
+				else:
+					if self.operation=='ingresos':saldo=prestamos_list['tarjeta']+eval(monto)
+					elif self.operation=='egresos':saldo=prestamos_list['tarjeta']-eval(monto)
+					crud.db.child('fondo').child('prestamos').child(self.target).child(self.operation).push({'fecha':descripcion,'monto':monto})
+					clean_fields()
 		
 		def cancelar(object):
 			clean_fields()
 			self.dialog.dismiss()
 		
-		for i in MDApp.root.ids:
-			print(i)
-	
-	def mov_fondo(self,operation,target):
-		'''if 'tarjeta' in target:
-			print(f'Se haría un {operation} en tarjeta')
-		else:
-			target=target.replace('Prestamo ','')
-			print(f'Se haría un {operation} en {target}')
-'''
-		print(target)
+		self.dialog=MDDialog(
+				title='Registrar '+operation,
+				type='custom',
+				content_cls=Content(),
+				buttons=[
+					bt(text='Cancelar',on_release=cancelar),
+					bt(text='Registrar',on_release=registrar)]
+			)
+		self.dialog.open()
+		self.operation=operation
+		self.target=target
+
 class Cards(MDCard):
 	pass
 class Content(MDBoxLayout):
@@ -97,14 +124,13 @@ class Scr(MDBoxLayout):
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
-
-					crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
-					self.ids[operation].add_widget(TwoLineListItem(text='$'+self.dialog.content_cls.ids.monto.text,secondary_text=self.dialog.content_cls.ids.descripcion.text))
-					clean_fields()
-					if operation=='ingresos': balance+=eval(monto)
-					elif operation=='egresos': balance-=eval(monto)
-					self.ids.balance.text='Balance: '+"${:,.2f}".format(balance)
-					self.dialog.dismiss()
+				crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
+				self.ids[operation].add_widget(TwoLineListItem(text='$'+self.dialog.content_cls.ids.monto.text,secondary_text=self.dialog.content_cls.ids.descripcion.text))
+				clean_fields()
+				if operation=='ingresos': balance+=eval(monto)
+				elif operation=='egresos': balance-=eval(monto)
+				self.ids.balance.text='Balance: '+"${:,.2f}".format(balance)
+				self.dialog.dismiss()
 			else:
 				self.dialog.content_cls.ids.monto.error=True
 				self.dialog.content_cls.ids.descripcion.error=True
@@ -116,7 +142,7 @@ class Scr(MDBoxLayout):
 		self.dialog=MDDialog(
 				title='Registrar '+operation,
 				type='custom',
-				content_cls=Content() if self.parent.ids.scr_manager.current=='ingre_egre' else ContentFondo(),
+				content_cls=Content(),
 				buttons=[
 					bt(text='Cancelar',on_release=cancelar),
 					bt(text='Registrar',on_release=registrar)]
@@ -151,10 +177,11 @@ class Appson(MDApp):
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
 
 		#construyendo la pagina de ahorros
-		global ahorro
+		global ahorro,prestamos_list
 		tarjeta=crud.db.child('fondo').child('tarjeta').get()
 		prestamos=crud.db.child('fondo').child('prestamos').get()
 		ahorro+=eval(tarjeta.val())
+		prestamos_list['tarjeta']=eval(tarjeta.val())
 		card=Cards()
 		content = Buttons()
 		card.add_widget(
@@ -182,6 +209,7 @@ class Appson(MDApp):
 			)
 			))
 			self.root.ids.layout_fondo.add_widget(card)
+			prestamos_list[i.key()]=saldo
 
 
 if __name__=="__main__":
