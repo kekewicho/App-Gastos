@@ -50,6 +50,7 @@
         helper_text_mode: "on_error"
         helper_text: "Ingresa un valor válido"
         on_text: self.error=False
+		on_focus:if app.root.ids.scr_manager.current=='fondo': root.show_calendar()
 
 <Scr>:
 	MDNavigationLayout:
