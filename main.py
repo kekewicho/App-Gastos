@@ -14,10 +14,27 @@ actual=''
 ahorro=0
 prestamos_list={}
 
+'''
+Nota importante: saber que para el caso de las cuentas quincenales, los ingresos y egresos si significan su valor literal
+pero para el caso de las cuentas del ahorro, el calculo si se hace en referencia al monto del prestamo, es decir: un egreso
+sería un abono a la cuenta y viceversa.
+'''
+
 class ContentFondo(MDBoxLayout):
 	pass
 
 class Buttons(MDBoxLayout):
+	def refresh(self):
+		global prestamos_list
+		ahorrau=0
+		for i in self.parent.parent.parent.children:
+			if isinstance(i,MDCard):
+				prestamo=(i.children[0].panel_cls.text).replace('Prestamo ','') if not 'tarjeta' in i.children[0].panel_cls.text else 'tarjeta'
+				i.children[0].panel_cls.secondary_text='En esta cuenta: '+"${:,.2f}".format(prestamos_list[prestamo])
+				ahorrau+=abs(prestamos_list[prestamo])
+		self.parent.parent.parent.children[-1].children[0].text='Total ahorros: '+"${:,.2f}".format(ahorrau)
+		
+
 	def validacion(self,field,text):
 		if field=='monto':
 			if '.' in text:
@@ -51,11 +68,13 @@ class Buttons(MDBoxLayout):
 					prestamos_list['tarjeta']=saldo
 				else:
 					saldo=prestamos_list[self.target]+eval(monto) if self.operation=='ingresos' else prestamos_list[self.target]-eval(monto)
+					tarjeta=prestamos_list['tarjeta']+eval(monto) if self.operation=='ingresos' else prestamos_list['tarjeta']-eval(monto)
 					crud.db.child('fondo').child('prestamos').child(self.target).child(self.operation).push({'fecha':descripcion,'monto':monto})
+					crud.db.child('fondo').update({'tarjeta':str(tarjeta)})
 					clean_fields()
 					prestamos_list[self.target]=saldo
-				self.parent.panel_cls.secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo)
-				self.parent.parent.parent.children[-1].children[0].text='Total ahorrado: '+"${:,.2f}".format(ahorro)
+					prestamos_list['tarjeta']=tarjeta
+				self.refresh()
 				self.dialog.dismiss()
 
 		def cancelar(object):
@@ -211,16 +230,15 @@ class Appson(MDApp):
 				for h in op.each():
 					if j=='ingresos':saldo+=eval(h.val()['monto'])
 				else: saldo-=eval(h.val()['monto'])
-
 			card=Cards()
 			content = Buttons()
 			card.add_widget(
 				MDExpansionPanel(
 				content=content,
-				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta:'+"${:,.2f}".format(saldo),
+				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta: '+"${:,.2f}".format(saldo),
 			)
 			))
-			ahorro+=saldo
+			ahorro+=abs(saldo)
 			self.root.ids.layout_fondo.add_widget(card)
 			prestamos_list[i.key()]=saldo
 		self.root.ids.ahorrado.text='Total ahorrado: '+"${:,.2f}".format(ahorro)
