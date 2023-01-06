@@ -16,18 +16,20 @@
 		anchor_x:'center'
 		anchor_y:'center'
 		MDFillRoundFlatIconButton:
-			text:'Ingreso'
+			text:'Ingreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Abono'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
-			on_release:app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
+			on_release:
+				app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
 		MDFillRoundFlatIconButton:
-			text:'Egreso'
+			text:'Egreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Préstamo'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
-			on_release:app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.panel_cls.text)
+			on_release:
+				app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.panel_cls.text)
 
 <Content>
     orientation: "vertical"
