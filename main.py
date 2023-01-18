@@ -264,9 +264,12 @@ class Appson(MDApp):
 			saldo=0
 			for j in ('ingresos','egresos'):
 				op=crud.db.child('fondo').child('prestamos').child(i.key()).child(j).get()
-				for h in op.each():
-					if j=='ingresos':saldo+=eval(h.val()['monto'])
-					else: saldo-=eval(h.val()['monto'])
+				if op.each() is None:
+					pass
+				else:
+					for h in op.each():
+						if j=='ingresos':saldo+=eval(h.val()['monto'])
+						else: saldo-=eval(h.val()['monto'])
 			card=Cards()
 			content = Buttons()
 			card.add_widget(
