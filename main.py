@@ -19,6 +19,8 @@ Nota importante: saber que para el caso de las cuentas quincenales, los ingresos
 pero para el caso de las cuentas del ahorro, el calculo si se hace en referencia al monto del prestamo, es decir: un egreso
 sería un abono a la cuenta y viceversa.
 '''
+class ContentNvoPrestamo(MDBoxLayout):
+	pass
 
 class ContentFondo(MDBoxLayout):
 	pass
@@ -109,6 +111,41 @@ class Content(MDBoxLayout):
 		pass
 
 class Scr(MDBoxLayout):
+	def nuevo_prestamo(self):
+		def clean_fields():
+			self.dialog.content_cls.ids.descripcion.text=''
+		
+		def registrar(object):
+			global prestamos_list
+			nombre=self.dialog.content_cls.ids.descripcion.text
+			crud.db.child('fondo').child('prestamos').child(nombre).set('')
+			card=Cards()
+			content = Buttons()
+			card.add_widget(
+				MDExpansionPanel(
+				content=content,
+				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+nombre,secondary_text='En esta cuenta: '+"${:,.2f}".format(0),
+			)
+			))
+			self.ids.layout_fondo.add_widget(card)
+			prestamos_list[nombre]=0
+			self.dialog.dismiss()
+		
+		def cancelar(object):
+			clean_fields()
+			self.dialog.dismiss()
+		
+		self.dialog=MDDialog(
+				title='Nuevo préstamo',
+				text='Nota: No uses la palabra "Prestamo"',
+				type='custom',
+				content_cls=ContentNvoPrestamo(),
+				buttons=[
+					bt(text='Cancelar',on_release=cancelar),
+					bt(text='Registrar',on_release=registrar)]
+			)
+		self.dialog.open()
+
 	def validacion(self,field,text):
 		if field=='monto':
 			if '.' in text:

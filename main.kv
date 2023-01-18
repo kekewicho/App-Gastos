@@ -7,11 +7,25 @@
 	pos_hint: {"center_x": .5, "center_y": .5}
 	padding:10
 
+<ContentNvoPrestamo>:
+	orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "60dp"
+
+    MDTextField:
+        id: descripcion
+        error:False
+        hint_text: "Descripción"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        on_text: self.error=False
+
 <Buttons>:
 	padding:2
 	spacing:15
 	size_hint_y:None
-	height:60
+	height:150
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -165,6 +179,10 @@
 									text_color: "red" if '-' in self.text else 'black'
 									size_hint_y:None
 									adaptive_height: True
+							MDRaisedButton:
+								text:'+ Nuevo prestamo'
+								size_hint_x:1
+								on_release:root.nuevo_prestamo()
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
