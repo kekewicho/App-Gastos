@@ -4,9 +4,12 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton as bt
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.list import TwoLineListItem
-from kivymd.uix.card import MDCard
+from kivymd.uix.card import MDCard,MDCardSwipe
 from kivymd.uix.expansionpanel import MDExpansionPanel,MDExpansionPanelTwoLine
 from kivymd.uix.pickers import MDDatePicker
+from kivy.properties import StringProperty
+from kivy.utils import platform
+from kivymd.uix.card import MDSeparator
 import crud
 
 balance=0
@@ -19,6 +22,11 @@ Nota importante: saber que para el caso de las cuentas quincenales, los ingresos
 pero para el caso de las cuentas del ahorro, el calculo si se hace en referencia al monto del prestamo, es decir: un egreso
 sería un abono a la cuenta y viceversa.
 '''
+
+class OPItem(MDCardSwipe):
+	monto=StringProperty()
+	descripcion=StringProperty()
+
 class ContentNvoPrestamo(MDBoxLayout):
 	pass
 
@@ -98,6 +106,7 @@ class Buttons(MDBoxLayout):
 
 class Cards(MDCard):
 	pass
+
 class Content(MDBoxLayout):
 	def show_calendar(self):
 		date_dialog = MDDatePicker()
@@ -168,21 +177,25 @@ class Scr(MDBoxLayout):
 		actual=a
 		for operation in ('ingresos','egresos'):
 			self.ids[operation].clear_widgets()
-			data=crud.db.child('ingre_egre').child(actual).child(operation).get()
+			data=crud.db.child('ingre_egre').child(actual).child(operation).get() if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).get()
 			if data.each() is None:
 				pass
 			else:
 				for value in data.each():
+					self.ids[operation].add_widget(MDSeparator())
+					item=OPItem(monto='$'+value.val()['monto'],descripcion=value.val()['descripcion'])
+					item.ids.btnDelete.on_release=lambda x=value.key():self.root.delete_op(x,operation,actual)
+					item.ids.btnEdit.on_release=lambda x=value.key():self.root.edit_op(x,operation)
 					if operation=='ingresos':
 						balance+=eval(value.val()['monto'])
-						self.ids.ingresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+						self.ids.ingresos.add_widget(item)
 					elif operation=='egresos':
 						balance-=eval(value.val()['monto'])
-						self.ids.egresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+						self.ids.egresos.add_widget(item)
 		self.ids.balance.text="Balance: ${:,.2f}".format(balance)
 
 
-	def registro(self,operation):
+	def registro(self,operation,edit=False):
 		def clean_fields():
 			self.dialog.content_cls.ids.monto.text=''
 			self.dialog.content_cls.ids.descripcion.text=''
@@ -192,7 +205,7 @@ class Scr(MDBoxLayout):
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
-				crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
+				crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion}) if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
 				self.ids[operation].add_widget(TwoLineListItem(text='$'+self.dialog.content_cls.ids.monto.text,secondary_text=self.dialog.content_cls.ids.descripcion.text))
 				clean_fields()
 				if operation=='ingresos': balance+=eval(monto)
@@ -224,6 +237,7 @@ class Appson(MDApp):
 		return Scr()
 	
 	def on_start(self):
+		self.root.ids.lblUser.text+='Luisito!' if platform=='win' else 'Joselincita! <3'
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
@@ -231,18 +245,25 @@ class Appson(MDApp):
 		quincena_actual=crud.translate_codigo(actual)
 		self.root.ids.quincena.text=quincena_actual
 		for operation in ('ingresos','egresos'):
-			data=crud.db.child('ingre_egre').child(actual).child(operation).get()
+			data=crud.db.child('ingre_egre').child(actual).child(operation).get() if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).get()
 			if data.each() is None:
 				pass
 			else:
 				for value in data.each():
+					self.root.ids[operation].add_widget(MDSeparator())
+					item=OPItem(monto='$'+value.val()['monto'],descripcion=value.val()['descripcion'])
 					if operation=='ingresos':
 						balance+=eval(value.val()['monto'])
-						self.root.ids.ingresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+						self.root.ids.ingresos.add_widget(item)
 					elif operation=='egresos':
 						balance-=eval(value.val()['monto'])
-						self.root.ids.egresos.add_widget(TwoLineListItem(text='$'+value.val()['monto'],secondary_text=value.val()['descripcion']))
+						self.root.ids.egresos.add_widget(item)
+					item.ids.btnDelete.on_release=lambda x=value.key():self.delete_op(x,operation,actual,item)
+					item.ids.btnEdit.on_release=lambda x=value.key():self.edit_op(x,operation,item)
+
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
+
+		if platform=='macosx':return None
 
 		#construyendo la pagina de ahorros
 		global ahorro,prestamos_list
@@ -282,7 +303,47 @@ class Appson(MDApp):
 			self.root.ids.layout_fondo.add_widget(card)
 			prestamos_list[i.key()]=saldo
 		self.root.ids.ahorrado.text='Total ahorrado: '+"${:,.2f}".format(ahorro)
-
+	
+	def delete_op(self,event,op,quincena,wdg):
+		#a='joss/' if platform=='macosx' else ''
+		#crud.db.child(f'{a}ingre_egre/{quincena}/{op}/{event}').remove()
+		print(self.root.ids.egresos.remove_widget(wdg))
+	
+	def edit_op(self,event,operation,wdg):
+		a='joss/' if platform=='macosx' else ''
+		
+		def clean_fields():
+			self.dialog.content_cls.ids.monto.text=''
+			self.dialog.content_cls.ids.descripcion.text=''
+		
+		def registrar(object):
+			global balance, actual
+			monto=self.dialog.content_cls.ids.monto.text
+			descripcion=self.dialog.content_cls.ids.descripcion.text
+			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
+				crud.db.child(f'{a}ingre_egre/{actual}/{operation}/{event}').update({'monto':monto,'descripcion':descripcion})
+				clean_fields()
+				if operation=='ingresos': balance+=eval(monto)
+				elif operation=='egresos': balance-=eval(monto)
+				self.ids.balance.text='Balance: '+"${:,.2f}".format(balance)
+				self.dialog.dismiss()
+			else:
+				self.dialog.content_cls.ids.monto.error=True
+				self.dialog.content_cls.ids.descripcion.error=True
+		
+		def cancelar(object):
+			clean_fields()
+			self.dialog.dismiss()
+		
+		self.dialog=MDDialog(
+				title='Registrar '+operation,
+				type='custom',
+				content_cls=Content(),
+				buttons=[
+					bt(text='Cancelar',on_release=cancelar),
+					bt(text='Registrar',on_release=registrar)]
+			)
+		self.dialog.open()
 
 if __name__=="__main__":
 	Appson().run()
