@@ -249,7 +249,7 @@ class Appson(MDApp):
 		return Scr()
 	
 	def on_start(self):
-		self.root.ids.lblUser.text+='Luisito!' if platform=='win' else 'Joselincita! <3'
+		self.root.ids.lblUser.text+='Luisito!' if platform!='macosx' else 'Joselincita! <3'
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
