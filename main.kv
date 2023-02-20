@@ -1,5 +1,4 @@
 #:import WipeTransition kivy.uix.screenmanager.WipeTransition
-#:import platform kivy.utils
 <Cards>:
 	elevation:2
 	orientation: "vertical"
@@ -10,7 +9,7 @@
 
 <OPItem>:
     size_hint_y: None
-    height: '55sp'
+    height: '60sp'
     radius:1
     MDCardSwipeLayerBox:
 		MDIconButton:
@@ -18,11 +17,16 @@
 			theme_icon_color: "Custom"
 			icon_color: '#990000'
 			id:btnDelete
+			on_release:
+				root.parent.remove_widget(root)
+				app.delete_op(root.key,root.op,root.monto)
 		MDIconButton:
 			icon:'pencil'
 			theme_icon_color: "Custom"
 			icon_color: '#3082a9'
 			id:btnEdit
+			on_release:
+				app.edit_op(root.key,root.op,root)
     MDCardSwipeFrontBox:
 		ripple_behavior:True
 		focus_behavior: True
@@ -34,11 +38,11 @@
 		MDLabel:
 			text:root.monto
 			bold:True
-			font_size:'14sp'
+			font_size:'16sp'
 		MDLabel:
 			text:root.descripcion
 			shorten:True
-			font_size:'12sp'
+			font_size:'14sp'
 			theme_text_color: "Custom"
 			text_color: '#a7a7a7'
 
@@ -110,6 +114,7 @@
 			transition:WipeTransition()
 			Screen:
 				name: 'ingre_egre'
+				md_bg_color:1,1,1,1
 				MDBoxLayout:
 					size_hint_x:.9
 					orientation:'vertical'
