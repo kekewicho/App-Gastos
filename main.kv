@@ -1,4 +1,5 @@
 #:import WipeTransition kivy.uix.screenmanager.WipeTransition
+#:import platform kivy.utils
 <Cards>:
 	elevation:2
 	orientation: "vertical"
@@ -6,6 +7,40 @@
 	height: self.minimum_height
 	pos_hint: {"center_x": .5, "center_y": .5}
 	padding:10
+
+<OPItem>:
+    size_hint_y: None
+    height: '55sp'
+    radius:1
+    MDCardSwipeLayerBox:
+		MDIconButton:
+			icon:'delete'
+			theme_icon_color: "Custom"
+			icon_color: '#990000'
+			id:btnDelete
+		MDIconButton:
+			icon:'pencil'
+			theme_icon_color: "Custom"
+			icon_color: '#3082a9'
+			id:btnEdit
+    MDCardSwipeFrontBox:
+		ripple_behavior:True
+		focus_behavior: True
+		radius:0
+		orientation:'vertical'
+		padding:15
+		spacing:5
+		on_release:root.open_card() if root.state=='closed' else root.close_card()
+		MDLabel:
+			text:root.monto
+			bold:True
+			font_size:'14sp'
+		MDLabel:
+			text:root.descripcion
+			shorten:True
+			font_size:'12sp'
+			theme_text_color: "Custom"
+			text_color: '#a7a7a7'
 
 <ContentNvoPrestamo>:
 	orientation: "vertical"
@@ -25,7 +60,7 @@
 	padding:2
 	spacing:15
 	size_hint_y:None
-	height:150
+	height:"60dp"
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -75,87 +110,91 @@
 			transition:WipeTransition()
 			Screen:
 				name: 'ingre_egre'
-				MDFloatLayout:
-					md_bg_color:1,1,1,1
-					MDIconButton:
-						icon:'menu'
-						pos_hint:{'x':.05,'top':1}
-						on_release:nav_drawer.set_state('open')
+				MDBoxLayout:
+					size_hint_x:.9
+					orientation:'vertical'
+					pos_hint:{'center_x':.5,'center_y':.5}
+					spacing:50
+					padding:0,'5dp',0,'30dp'
 					MDBoxLayout:
-						size_hint_x:.9
-						orientation:'vertical'
-						pos_hint:{'center_x':.5,'center_y':.5}
-						spacing:50
-						MDFloatLayout:
-							size_hint_y:.1
-						MDBoxLayout:
-							size_hint_y:.08
-							id:slotquince
-							MDIconButton:
-								icon:"chevron-left"
-								on_release:root.trasladar_quincena('previous')
-							MDLabel:
-								id:quincena
-								halign:'center'
-								valign:'center'
-								text:'[QUINCENA ACTUAL]'
-							MDIconButton:
-								icon:'chevron-right'
-								on_release:root.trasladar_quincena('next')
+						size_hint_y:None
+						height:self.minimum_height
+						MDIconButton:
+							icon:'menu'
+							pos_hint:{'x':.05,'top':1}
+							on_release:nav_drawer.set_state('open')
 						MDLabel:
+							id:lblUser
+							halign:'right'
+							valign:'center'
+							text:'¡Wendía, '
+							font_size:'16sp'
+							#adaptive_height:True
 							bold:True
+					MDBoxLayout:
+						size_hint_y:.08
+						id:slotquince
+						MDIconButton:
+							icon:"chevron-left"
+							on_release:root.trasladar_quincena('previous')
+						MDLabel:
+							id:quincena
 							halign:'center'
-							size_hint_y:.1
-							text:'Balance: '
-							id:balance
-							font_size:sp(20)
-							theme_text_color: "Custom"
-							text_color: "red" if '-' in self.text else 'black'
-						MDBoxLayout:
-							size_hint_y:.1
-							MDFloatLayout:
-							MDFillRoundFlatIconButton:
-								text:'Ingreso'
-								icon:'cash-plus'
-								md_bg_color:'#086001'
-								on_release:root.registro('ingresos')
-							MDFloatLayout:
-								size_hint_x:.5
-							MDFillRoundFlatIconButton:
-								text:'Egreso'
-								icon:'cash-remove'
-								md_bg_color:'#7d0204'
-								on_release:root.registro('egresos')
-							MDFloatLayout:
-						MDBoxLayout:
-							spacing:15
-							MDBoxLayout:
-								orientation:'vertical'
-								MDLabel:
-									text:'Ingresos'
-									halign:'center'
-									size_hint_y:.1
-								ScrollView:
-									MDList:
-										id:ingresos
-							MDBoxLayout:
-								orientation:'vertical'
-								MDLabel:
-									text:'Egresos'
-									halign:'center'
-									size_hint_y:.1
-								ScrollView:
-									MDList:
-										id:egresos
+							valign:'center'
+							text:'[QUINCENA ACTUAL]'
+						MDIconButton:
+							icon:'chevron-right'
+							on_release:root.trasladar_quincena('next')
+					MDLabel:
+						bold:True
+						halign:'center'
+						size_hint_y:.1
+						text:'Balance: '
+						id:balance
+						font_size:sp(20)
+						theme_text_color: "Custom"
+						text_color: "red" if '-' in self.text else 'black'
+					MDBoxLayout:
+						size_hint_y:.1
 						MDFloatLayout:
-							size_hint_y:.1
+						MDFillRoundFlatIconButton:
+							text:'Ingreso'
+							icon:'cash-plus'
+							md_bg_color:'#7cd16f'
+							on_release:root.registro('ingresos');print(platform=='win')
+						MDFloatLayout:
+							size_hint_x:.5
+						MDFillRoundFlatIconButton:
+							text:'Egreso'
+							icon:'cash-remove'
+							md_bg_color:'#bf1336'
+							on_release:root.registro('egresos')
+						MDFloatLayout:
+					MDBoxLayout:
+						spacing:15
+						MDBoxLayout:
+							orientation:'vertical'
+							spacing:15
+							MDLabel:
+								text:'Ingresos'
+								halign:'center'
+								size_hint_y:.1
+							ScrollView:
+								MDList:
+									id:ingresos
+						MDBoxLayout:
+							orientation:'vertical'
+							spacing:15
+							MDLabel:
+								text:'Egresos'
+								halign:'center'
+								size_hint_y:.1
+							ScrollView:
+								MDList:
+									id:egresos
 			Screen:
 				name: 'fondo'
 				MDFloatLayout:
-					MDIconButton:
-						icon:'menu'
-						pos_hint:{'x':.05,'top':1}
-						on_release:nav_drawer.set_state('open')
 					ScrollView:
 						MDGridLayout:
 							row_default_height:10
@@ -183,6 +222,10 @@
 								text:'+ Nuevo prestamo'
 								size_hint_x:1
 								on_release:root.nuevo_prestamo()
+					MDIconButton:
+						icon:'menu'
+						pos_hint:{'x':.05,'top':1}
+						on_release:nav_drawer.set_state('open')
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
