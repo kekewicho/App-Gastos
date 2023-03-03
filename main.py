@@ -175,9 +175,9 @@ class Scr(MDBoxLayout):
 			else: False
 	
 	def trasladar_quincena(self,direction):
-		Thread(target=trasladar_quincena_que()).start()
+		Thread(target=self.trasladar_quincena_que(direction)).start()
 	
-	def trasladar_quincena_que(self):
+	def trasladar_quincena_que(self,direction):
 		global actual,balance
 		balance=0
 		a=crud.quince_actual('valor',direction,actual)
@@ -333,18 +333,22 @@ class Appson(MDApp):
 
 	
 	def on_start(self):
-		global balance,actual
+		Thread(target=self.starting_queue).start()
 
-		self.root.ids.lblUser.text+='Luisito!' if platform!='macosx' else 'Joselincita! <3'
+	def starting_queue(self):
+		global balance,actual
 		actual=crud.quince_actual('new')
 		quincena_actual=crud.translate_codigo(actual)
-		self.root.ids.quincena.text=quincena_actual
-		Thread(target=self.ingre_egre_init_consulta()).start()
+		self.modify_labels(quincena_actual)
+		Thread(target=self.ingre_egre_init_consulta).start()
 		if platform=='macosx':return None
-		Thread(target=self.fondo_init_consulta()).start()
+		Thread(target=self.fondo_init_consulta).start()
 
-		
-	
+	@mainthread
+	def modify_labels(self,quincena):
+		self.root.ids.lblUser.text+='Luisito!' if platform!='macosx' else 'Joselincita! <3'
+		self.root.ids.quincena.text=quincena
+
 	def delete_op(self,event,op,monto):
 		global actual,balance
 		a='joss/' if platform=='macosx' else ''
