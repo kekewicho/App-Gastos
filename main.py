@@ -303,6 +303,7 @@ class Appson(MDApp):
 						else: saldo-=eval(h.val()['monto'])
 			ahorro+=abs(saldo)
 			prestamos_list[i.key()]=saldo
+			self.fondo_init_construction(i.key(),saldo)
 		self.update_ahorrado(ahorro)
 
 	@mainthread
@@ -323,13 +324,13 @@ class Appson(MDApp):
 
 
 	@mainthread
-	def fondo_init_construction(self):
+	def fondo_init_construction(self,key,saldo):
 		card=Cards()
 		content = Buttons()
 		card.add_widget(
 			MDExpansionPanel(
 			content=content,
-			panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta: '+"${:,.2f}".format(saldo),
+			panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+key,secondary_text='En esta cuenta: '+"${:,.2f}".format(saldo),
 		)
 		))
 		self.root.ids.layout_fondo.add_widget(card)
