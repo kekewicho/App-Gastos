@@ -175,6 +175,9 @@ class Scr(MDBoxLayout):
 			else: False
 	
 	def trasladar_quincena(self,direction):
+		Thread(target=trasladar_quincena_que()).start()
+	
+	def trasladar_quincena_que(self):
 		global actual,balance
 		balance=0
 		a=crud.quince_actual('valor',direction,actual)
@@ -187,19 +190,12 @@ class Scr(MDBoxLayout):
 				pass
 			else:
 				for value in data.each():
-					self.ids[operation].add_widget(MDSeparator())
-					item=OPItem(
-						monto='$'+value.val()['monto'],
-						descripcion=value.val()['descripcion'],
-						op=operation,
-						key=value.key()
-						)
 					if operation=='ingresos':
 						balance+=eval(value.val()['monto'])
-						self.ids.ingresos.add_widget(item)
+						MDApp.get_running_app().ingre_egre_init_construction('ingresos',value)
 					elif operation=='egresos':
 						balance-=eval(value.val()['monto'])
-						self.ids.egresos.add_widget(item)
+						MDApp.get_running_app().ingre_egre_init_construction('egresos',value)
 		self.ids.balance.text="Balance: ${:,.2f}".format(balance)
 
 
