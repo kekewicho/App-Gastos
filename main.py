@@ -12,6 +12,8 @@ from kivy.properties import StringProperty
 from kivy.utils import platform
 from kivymd.uix.card import MDSeparator
 import crud
+from threading import Thread
+from kivy.clock import mainthread
 
 balance=0
 actual=''
@@ -247,54 +249,48 @@ Builder.load_file('main.kv')
 class Appson(MDApp):
 	def build(self):
 		return Scr()
-	
-	def on_start(self):
-		self.root.ids.lblUser.text+='Luisito!' if platform!='macosx' else 'Joselincita! <3'
+
+	def ingre_egre_init_consulta(self):
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
-		actual=crud.quince_actual('new')
-		quincena_actual=crud.translate_codigo(actual)
-		self.root.ids.quincena.text=quincena_actual
 		for operation in ('ingresos','egresos'):
 			data=crud.db.child('ingre_egre').child(actual).child(operation).get() if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).get()
 			if data.each() is None:
 				pass
 			else:
 				for value in data.each():
-					self.root.ids[operation].add_widget(MDSeparator())
-					item=OPItem(
-						monto='$'+value.val()['monto'],
-						descripcion=value.val()['descripcion'],
-						key=value.key(),
-						op=operation
-						)
 					if operation=='ingresos':
 						balance+=eval(value.val()['monto'])
-						self.root.ids.ingresos.add_widget(item)
+						self.ingre_egre_init_construction('ingresos',value)
 					elif operation=='egresos':
 						balance-=eval(value.val()['monto'])
-						self.root.ids.egresos.add_widget(item)
+						self.ingre_egre_init_construction('egresos',value)
+		self.update_balance("${:,.2f}".format(balance))
+
+	@mainthread
+	def update_balance(self,text):
 		self.root.ids.balance.text+="${:,.2f}".format(balance)
 
-		if platform=='macosx':return None
-
+	@mainthread
+	def ingre_egre_init_construction(self,operation,value):
+		self.root.ids[operation].add_widget(MDSeparator())
+		item=OPItem(
+			monto='$'+value.val()['monto'],
+			descripcion=value.val()['descripcion'],
+			key=value.key(),
+			op=operation
+			)
+		self.root.ids[operation].add_widget(item)
+	
+	def fondo_init_consulta(self):
 		#construyendo la pagina de ahorros
 		global ahorro,prestamos_list
 		tarjeta=crud.db.child('fondo').child('tarjeta').get()
+		self.update_tarjeta(tarjeta)
 		prestamos=crud.db.child('fondo').child('prestamos').get()
 		ahorro+=eval(tarjeta.val())
 		prestamos_list['tarjeta']=eval(tarjeta.val())
-		card=Cards()
-		content = Buttons()
-		card.add_widget(
-			MDExpansionPanel(
-				content=content,
-				panel_cls=MDExpansionPanelTwoLine(text='En tarjeta del banco',secondary_text='En esta cuenta: '+"${:,.2f}".format(eval(tarjeta.val()))),
-			)
-		)
-		self.root.ids.layout_fondo.add_widget(card)
-
 		for i in prestamos.each():
 			saldo=0
 			for j in ('ingresos','egresos'):
@@ -305,18 +301,52 @@ class Appson(MDApp):
 					for h in op.each():
 						if j=='ingresos':saldo+=eval(h.val()['monto'])
 						else: saldo-=eval(h.val()['monto'])
-			card=Cards()
-			content = Buttons()
-			card.add_widget(
-				MDExpansionPanel(
-				content=content,
-				panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta: '+"${:,.2f}".format(saldo),
-			)
-			))
 			ahorro+=abs(saldo)
-			self.root.ids.layout_fondo.add_widget(card)
 			prestamos_list[i.key()]=saldo
+		self.update_ahorrado(ahorro)
+
+	@mainthread
+	def update_ahorrado(self,ahorro):
 		self.root.ids.ahorrado.text='Total ahorrado: '+"${:,.2f}".format(ahorro)
+	
+	@mainthread
+	def update_tarjeta(self,tarjeta):
+		card=Cards()
+		content = Buttons()
+		card.add_widget(
+			MDExpansionPanel(
+				content=content,
+				panel_cls=MDExpansionPanelTwoLine(text='En tarjeta del banco',secondary_text='En esta cuenta: '+"${:,.2f}".format(eval(tarjeta.val()))),
+			)
+		)
+		self.root.ids.layout_fondo.add_widget(card)
+
+
+	@mainthread
+	def fondo_init_construction(self):
+		card=Cards()
+		content = Buttons()
+		card.add_widget(
+			MDExpansionPanel(
+			content=content,
+			panel_cls=MDExpansionPanelTwoLine(text='Prestamo '+i.key(),secondary_text='En esta cuenta: '+"${:,.2f}".format(saldo),
+		)
+		))
+		self.root.ids.layout_fondo.add_widget(card)
+
+	
+	def on_start(self):
+		global balance,actual
+
+		self.root.ids.lblUser.text+='Luisito!' if platform!='macosx' else 'Joselincita! <3'
+		actual=crud.quince_actual('new')
+		quincena_actual=crud.translate_codigo(actual)
+		self.root.ids.quincena.text=quincena_actual
+		Thread(target=self.ingre_egre_init_consulta()).start()
+		if platform=='macosx':return None
+		Thread(target=self.fondo_init_consulta()).start()
+
+		
 	
 	def delete_op(self,event,op,monto):
 		global actual,balance
