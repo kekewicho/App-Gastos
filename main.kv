@@ -231,6 +231,40 @@
 						icon:'menu'
 						pos_hint:{'x':.05,'top':1}
 						on_release:nav_drawer.set_state('open')
+			Screen:
+				name: 'concubinos'
+				MDGridLayout:
+					row_default_height:10
+					adaptive_height:True
+					cols:1
+					id:layout_fondo
+					padding:'15dp','60dp','15dp','15dp'
+					spacing:'20dp'
+					MDBoxLayout:
+						size_hint_y:None
+						height:'100dp'
+						spacing:'10dp'
+						MDIconButton:
+							icon:'menu'
+							size_hint_x:None
+							on_release:nav_drawer.set_state('open')
+						MDBoxLayout:
+							spacing:'10dp'
+							orientation:'vertical'
+							MDLabel:
+								text:'Balance del yoryis: '
+								halign:'right'
+								valing:'center'
+								font_style:'H6'
+								theme_text_color: "Custom"
+    							text_color: '#474747' if not '-' in self.text else '#8c0900'
+							MDLabel:
+								text:'Balance de la yos: '
+								halign:'right'
+								valing:'center'
+								font_style:'H6'
+								theme_text_color: "Custom"
+    							text_color: '#474747' if not '-' in self.text else '#8c0900'
 		MDNavigationDrawer:
 			id:nav_drawer
 			MDBoxLayout:
@@ -265,4 +299,18 @@
 					on_release:
 						nav_drawer.set_state('close')
 						scr_manager.current='ingre_egre'
+				MDRectangleFlatIconButton:
+					font_size:sp(20)
+					halign:'left'
+					size_hint_x:1
+					icon: "home-heart"
+					text: "Casa Concubina"
+					theme_text_color: "Custom"
+					text_color: "black"
+					line_color: "white"
+					theme_icon_color: "Custom"
+					icon_color: "black"
+					on_release:
+						nav_drawer.set_state('close')
+						scr_manager.current='concubinos'
 				MDFloatLayout:
