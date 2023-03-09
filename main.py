@@ -39,6 +39,7 @@ class ContentFondo(MDBoxLayout):
 	pass
 
 class Buttons(MDBoxLayout):
+	who='luis' if platform!='macosx' else 'joss'
 	def refresh(self):
 		global prestamos_list
 		ahorrau=0
@@ -73,19 +74,19 @@ class Buttons(MDBoxLayout):
 			global prestamos_list,ahorro
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
-
+			who='luis' if platform!='macosx' else 'joss'
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
 				ahorro+=eval(monto) if self.operation=='ingresos' else eval(monto)*-1
 				if 'tarjeta' in self.target:
 					saldo=prestamos_list['tarjeta']+eval(monto) if self.operation=='ingresos' else prestamos_list['tarjeta']-eval(monto)
-					crud.db.child('fondo').update({'tarjeta':str(saldo)})
+					crud.db.child(f'fondo/{who}').update({'tarjeta':str(saldo)})
 					clean_fields()
 					prestamos_list['tarjeta']=saldo
 				else:
 					saldo=prestamos_list[self.target]+eval(monto) if self.operation=='ingresos' else prestamos_list[self.target]-eval(monto)
 					tarjeta=prestamos_list['tarjeta']+eval(monto) if self.operation=='ingresos' else prestamos_list['tarjeta']-eval(monto)
-					crud.db.child('fondo').child('prestamos').child(self.target).child(self.operation).push({'fecha':descripcion,'monto':monto})
-					crud.db.child('fondo').update({'tarjeta':str(tarjeta)})
+					crud.db.child(f'fondo/{who}').child('prestamos').child(self.target).child(self.operation).push({'fecha':descripcion,'monto':monto})
+					crud.db.child(f'fondo/{who}').update({'tarjeta':str(tarjeta)})
 					clean_fields()
 					prestamos_list[self.target]=saldo
 					prestamos_list['tarjeta']=tarjeta
@@ -125,6 +126,7 @@ class Content(MDBoxLayout):
 		pass
 
 class Scr(MDBoxLayout):
+	who='luis' if platform!='macosx' else 'joss'
 	def nuevo_prestamo(self):
 		def clean_fields():
 			self.dialog.content_cls.ids.descripcion.text=''
@@ -132,7 +134,8 @@ class Scr(MDBoxLayout):
 		def registrar(object):
 			global prestamos_list
 			nombre=self.dialog.content_cls.ids.descripcion.text
-			crud.db.child('fondo').child('prestamos').child(nombre).set('')
+			who='luis' if platform!='macosx' else 'joss'
+			crud.db.child(f'fondo/{who}').child('prestamos').child(nombre).set('')
 			card=Cards()
 			content = Buttons()
 			card.add_widget(
@@ -183,7 +186,7 @@ class Scr(MDBoxLayout):
 		a=crud.quince_actual('valor',direction,actual)
 		self.ids.quincena.text=crud.translate_codigo(a)
 		actual=a
-		who='joss' if platform!='macosx' else 'luis'
+		who='luis' if platform!='macosx' else 'joss'
 		for operation in ('ingresos','egresos'):
 			self.ids[operation].clear_widgets()
 			data=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).get()
@@ -209,7 +212,7 @@ class Scr(MDBoxLayout):
 			global balance, actual
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
-			who='joss' if platform!='macosx' else 'luis'
+			who='luis' if platform!='macosx' else 'joss'
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
 				a=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
 				self.ids[operation].add_widget(MDSeparator())
@@ -245,6 +248,8 @@ class Scr(MDBoxLayout):
 Builder.load_file('main.kv')
 
 class Appson(MDApp):
+	who='luis' if platform!='macosx' else 'joss'
+
 	def build(self):
 		return Scr()
 
@@ -252,7 +257,7 @@ class Appson(MDApp):
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
-		who='joss' if platform!='macosx' else 'luis'
+		who='luis' if platform!='macosx' else 'joss'
 		for operation in ('ingresos','egresos'):
 			data=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).get()
 			if data.each() is None:
@@ -285,15 +290,15 @@ class Appson(MDApp):
 	def fondo_init_consulta(self):
 		#construyendo la pagina de ahorros
 		global ahorro,prestamos_list
-		tarjeta=crud.db.child('fondo').child('tarjeta').get()
+		tarjeta=crud.db.child(f'fondo/{self.who}').child('tarjeta').get()
 		self.update_tarjeta(tarjeta)
-		prestamos=crud.db.child('fondo').child('prestamos').get()
+		prestamos=crud.db.child(f'fondo/{self.who}/prestamos').get()
 		ahorro+=eval(tarjeta.val())
 		prestamos_list['tarjeta']=eval(tarjeta.val())
 		for i in prestamos.each():
 			saldo=0
 			for j in ('ingresos','egresos'):
-				op=crud.db.child('fondo').child('prestamos').child(i.key()).child(j).get()
+				op=crud.db.child(f'fondo/{self.who}').child('prestamos').child(i.key()).child(j).get()
 				if op.each() is None:
 					pass
 				else:
