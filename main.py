@@ -1,10 +1,8 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix import widget
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton as bt
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.card import MDCard,MDCardSwipe
 from kivymd.uix.expansionpanel import MDExpansionPanel,MDExpansionPanelTwoLine
 from kivymd.uix.pickers import MDDatePicker
@@ -14,6 +12,9 @@ from kivymd.uix.card import MDSeparator
 import crud
 from threading import Thread
 from kivy.clock import mainthread
+from kivymd.uix.bottomsheet import MDCustomBottomSheet
+from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.label import MDLabel
 
 balance=0
 actual=''
@@ -25,6 +26,14 @@ Nota importante: saber que para el caso de las cuentas quincenales, los ingresos
 pero para el caso de las cuentas del ahorro, el calculo si se hace en referencia al monto del prestamo, es decir: un egreso
 sería un abono a la cuenta y viceversa.
 '''
+
+class BtmSheet(MDBoxLayout):
+	def get_data(self):
+		data={
+			'quien':self.ids.quien.text,
+			'cantidad':self.ids.cantidad.text
+		}
+		return data
 
 class OPItem(MDCardSwipe):
 	monto=StringProperty()
@@ -413,6 +422,14 @@ class Appson(MDApp):
 		self.dialog.content_cls.ids.monto.text=(wdg.monto).replace('$','').replace(',','')
 		self.dialog.content_cls.ids.descripcion.text=wdg.descripcion
 		self.dialog.open()
+	
+
+#-------------- FUNCIONES DE CONCUBINOS -----------------
+	custom_sheet = MDCustomBottomSheet(screen=BtmSheet())
+	def addGastoConcubino(self):
+		data=self.custom_sheet.screen.get_data()
+		crud.db.child('concubinos/gastos').push(data)
+		Snackbar(text='Gasto guardado con éxito').open()
 
 if __name__=="__main__":
 	Appson().run()
