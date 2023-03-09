@@ -183,9 +183,10 @@ class Scr(MDBoxLayout):
 		a=crud.quince_actual('valor',direction,actual)
 		self.ids.quincena.text=crud.translate_codigo(a)
 		actual=a
+		who='joss' if platform!='macosx' else 'luis'
 		for operation in ('ingresos','egresos'):
 			self.ids[operation].clear_widgets()
-			data=crud.db.child('ingre_egre').child(actual).child(operation).get() if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).get()
+			data=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).get()
 			if data.each() is None:
 				pass
 			else:
@@ -208,8 +209,9 @@ class Scr(MDBoxLayout):
 			global balance, actual
 			monto=self.dialog.content_cls.ids.monto.text
 			descripcion=self.dialog.content_cls.ids.descripcion.text
+			who='joss' if platform!='macosx' else 'luis'
 			if self.validacion('monto',monto) and self.validacion('descripcion',descripcion):
-				a=crud.db.child('ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion}) if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
+				a=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).push({'monto':monto,'descripcion':descripcion})
 				self.ids[operation].add_widget(MDSeparator())
 				self.ids[operation].add_widget(OPItem(
 					monto='$'+self.dialog.content_cls.ids.monto.text,
@@ -250,8 +252,9 @@ class Appson(MDApp):
 		#construyendo la pagina de las cuentas quincenales
 		global balance
 		global actual
+		who='joss' if platform!='macosx' else 'luis'
 		for operation in ('ingresos','egresos'):
-			data=crud.db.child('ingre_egre').child(actual).child(operation).get() if platform!='macosx' else crud.db.child('joss/ingre_egre').child(actual).child(operation).get()
+			data=crud.db.child(f'ingre_egre/{who}').child(actual).child(operation).get()
 			if data.each() is None:
 				pass
 			else:
@@ -351,8 +354,8 @@ class Appson(MDApp):
 
 	def delete_op(self,event,op,monto):
 		global actual,balance
-		a='joss/' if platform=='macosx' else ''
-		crud.db.child(f'{a}ingre_egre/{actual}/{op}/{event}').remove()
+		a='joss' if platform=='macosx' else 'luis'
+		crud.db.child(f'ingre_egre/{a}/{actual}/{op}/{event}').remove()
 		monto=monto.replace('$','').replace(',','')
 		print(op,monto)
 		if op=='ingresos': balance-=eval(monto)
@@ -361,7 +364,7 @@ class Appson(MDApp):
 		
 	
 	def edit_op(self,event,operation,wdg):
-		a='joss/' if platform=='macosx' else ''
+		a='joss' if platform=='macosx' else 'luis'
 		monto_before=eval((wdg.monto).replace('$','').replace(',',''))
 		def clean_fields():
 			self.dialog.content_cls.ids.monto.text=''
@@ -373,7 +376,7 @@ class Appson(MDApp):
 			descripcion=self.dialog.content_cls.ids.descripcion.text
 			if self.root.validacion('monto',monto) and self.root.validacion('descripcion',descripcion):
 				if monto_before==monto:self.dialog.dismiss();return None
-				crud.db.child(f'{a}ingre_egre/{actual}/{operation}/{event}').update({'monto':monto,'descripcion':descripcion})
+				crud.db.child(f'ingre_egre/{a}/{actual}/{operation}/{event}').update({'monto':monto,'descripcion':descripcion})
 				clean_fields()
 				dif=abs(monto_before-eval(monto))
 				if monto_before>eval(monto):
