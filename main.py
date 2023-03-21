@@ -428,7 +428,7 @@ class Appson(MDApp):
 	custom_sheet = MDCustomBottomSheet(screen=BtmSheet())
 	gastos_concubinos=[]
 
-	def addGastoConcubino(self):
+	def addGastoConcubino(self,data):
 		data=self.custom_sheet.screen.get_data()
 		self.custom_sheet.close()
 		key=crud.db.child('concubinos/gastos').push(data)
@@ -449,11 +449,19 @@ class Appson(MDApp):
 		if balance_joss>balance_luis:
 			self.root.ids.balanceConcubino.text=f'El yoryis le debe a la yos {"${:,.2f}".format(diferencia)}'
 		if balance_joss==balance_luis:
-			self.root.ids.balanceConcubino.text='Ahorita estan a mano'
+			self.root.ids.balanceConcubino.text='Ahorita estan a mano, no pelien'
 	
+	@mainthread
 	def add_gasto_widget(self,data,key):
 		item=OPItem(monto="${:,.2f}".format(data['cantidad']),descripcion=f'Pagó {data["quien"]}')
-		#item.ids.btnDelete.bind(on_release=lambda x:)
+		item.ids.btnDelete.on_release=lambda x=key:self.delete_gasto_concubino(x)
+		item.ids.btnEdit.on_release=lambda x=key:self.edit_gasto_concubino(x)
+	
+	def delete_gasto_concubino(self,key):
+		print(key)
+	
+	def edit_gasto_concubino(self,key):
+		pass
 
 
 if __name__=="__main__":
