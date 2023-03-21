@@ -31,7 +31,7 @@ class BtmSheet(MDBoxLayout):
 	def get_data(self):
 		data={
 			'quien':self.ids.quien.text,
-			'cantidad':self.ids.cantidad.text
+			'cantidad':float(self.ids.cantidad.text)
 		}
 		return data
 
@@ -426,10 +426,35 @@ class Appson(MDApp):
 
 #-------------- FUNCIONES DE CONCUBINOS -----------------
 	custom_sheet = MDCustomBottomSheet(screen=BtmSheet())
+	gastos_concubinos=[]
+
 	def addGastoConcubino(self):
 		data=self.custom_sheet.screen.get_data()
-		crud.db.child('concubinos/gastos').push(data)
+		self.custom_sheet.close()
+		key=crud.db.child('concubinos/gastos').push(data)
+		self.gastos_concubinos.append(data)
+		self.add_gasto_widget(data,key)
 		Snackbar(text='Gasto guardado con éxito').open()
+	
+	def update_balance(self):
+		balance_luis,balance_joss=0,0
+		for i in self.gastos_concubinos:
+			if i['quien']=='joss':
+				balance_joss+=i['cantidad']
+			if i['quien']=='luis':
+				balance_luis+=i['cantidad']
+		diferencia=abs(balance_luis-balance_joss)
+		if balance_luis>balance_joss:
+			self.root.ids.balanceConcubino.text=f'La yos le debe al yoryis {"${:,.2f}".format(diferencia)}'
+		if balance_joss>balance_luis:
+			self.root.ids.balanceConcubino.text=f'El yoryis le debe a la yos {"${:,.2f}".format(diferencia)}'
+		if balance_joss==balance_luis:
+			self.root.ids.balanceConcubino.text='Ahorita estan a mano'
+	
+	def add_gasto_widget(self,data,key):
+		item=OPItem(monto="${:,.2f}".format(data['cantidad']),descripcion=f'Pagó {data["quien"]}')
+		#item.ids.btnDelete.bind(on_release=lambda x:)
+
 
 if __name__=="__main__":
 	Appson().run()
