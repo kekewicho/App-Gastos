@@ -1,0 +1,135 @@
+<BtmSheet>:
+	orientation:'vertical'
+	padding:'20dp'
+	spacing:'10dp'
+	size_hint_y: None
+    height: "400dp"
+	MDTextField:
+		hint_text:'¿Quién lo pago?'
+		id:quien
+	MDTextField:
+		hint_text:'¿Cuánto pago?'
+		id:cantidad
+	MDBoxLayout:
+		MDFloatLayout:
+		MDRectangleFlatButton:
+			text: "Cancelar"
+			theme_text_color: "Custom"
+			text_color: "black"
+			line_color: "white"
+			on_release:app.custom_sheet.close()
+		MDRectangleFlatButton:
+			text: "Guardar"
+			theme_text_color: "Custom"
+			text_color: "#089cba"
+			line_color: "white"
+			on_release:app.addGastoConcubino()
+
+
+<Cards>:
+	elevation:2
+	orientation: "vertical"
+	size_hint: .6, None
+	height: self.minimum_height
+	pos_hint: {"center_x": .5, "center_y": .5}
+	padding:10
+
+<OPItem>:
+    size_hint_y: None
+    height: '60sp'
+    radius:1
+    MDCardSwipeLayerBox:
+		MDIconButton:
+			icon:'delete'
+			theme_icon_color: "Custom"
+			icon_color: '#990000'
+			id:btnDelete
+			on_release:
+				root.parent.remove_widget(root)
+				app.delete_op(root.key,root.op,root.monto)
+		MDIconButton:
+			icon:'pencil'
+			theme_icon_color: "Custom"
+			icon_color: '#3082a9'
+			id:btnEdit
+			on_release:
+				app.edit_op(root.key,root.op,root)
+    MDCardSwipeFrontBox:
+		ripple_behavior:True
+		focus_behavior: True
+		radius:0
+		orientation:'vertical'
+		padding:15
+		spacing:5
+		on_release:root.open_card() if root.state=='closed' else root.close_card()
+		MDLabel:
+			text:root.monto
+			bold:True
+			font_size:'16sp'
+		MDLabel:
+			text:root.descripcion
+			shorten:True
+			font_size:'14sp'
+			theme_text_color: "Custom"
+			text_color: '#a7a7a7'
+
+<ContentNvoPrestamo>:
+	orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "60dp"
+
+    MDTextField:
+        id: descripcion
+        error:False
+        hint_text: "Descripción"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        on_text: self.error=False
+
+<Buttons>:
+	padding:2
+	spacing:15
+	size_hint_y:None
+	height:"60dp"
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Ingreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Abono'
+			icon:'cash-plus'
+			md_bg_color:'#086001'
+			on_release:
+				app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Egreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Préstamo'
+			icon:'cash-remove'
+			md_bg_color:'#7d0204'
+			on_release:
+				app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.panel_cls.text)
+
+<ContentGastos>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDTextField:
+        id: monto
+        error:False
+        hint_text: "Monto"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        on_text: self.error=False
+
+    MDTextField:
+        id: descripcion
+        error: False
+        hint_text: "Descripción" if app.root.ids.scr_manager.current=='ingre_egre' else 'Fecha'
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        on_text: self.error=False
+		on_focus:if app.root.ids.scr_manager.current=='fondo': root.show_calendar()
