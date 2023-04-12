@@ -1,5 +1,5 @@
-<concubinosScreen>:
-    name: 'concubinosScreen'
+<ScreenConcubinos>:
+    name: 'ScreenConcubinos'
     ScrollView:
         MDGridLayout:
             row_default_height:10
@@ -17,7 +17,7 @@
                     size_hint_x:None
                     MDIconButton:
                         icon:'menu'
-                        on_release:nav_drawer.set_state('open')
+                        on_release:app.root.ids.nav_drawer.set_state('open')
                 MDLabel:
                     font_style:'H6'
                     halign:'right'
@@ -45,7 +45,6 @@
                         adaptive_height:True
                     MDIconButton:
                         icon:'plus'
-                        on_release:app.custom_sheet.open()
                 MDLabel:
                     text:'Aún no hay nada por aquí'
                     halign:'center'
