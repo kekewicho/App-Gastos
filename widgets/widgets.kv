@@ -32,7 +32,7 @@
 	size_hint: .6, None
 	height: self.minimum_height
 	pos_hint: {"center_x": .5, "center_y": .5}
-	padding:10
+	padding:"10dp"
 
 <OPItem>:
     size_hint_y: None
@@ -96,22 +96,22 @@
 		anchor_x:'center'
 		anchor_y:'center'
 		MDFillRoundFlatIconButton:
-			text:'Ingreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Abono'
+			text:'Abono'
 			icon:'cash-plus'
 			md_bg_color:'#086001'
 			on_release:
-				app.root.registro('ingreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('ingresos',root.parent.panel_cls.text)
+				app.root.ids.manager.get_screen("ScreenFondo").registro('ingresos',root.parent.panel_cls.text)
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
 		MDFillRoundFlatIconButton:
-			text:'Egreso' if app.root.ids.scr_manager.current=='ingre_egre' else 'Préstamo'
+			text:'Préstamo'
 			icon:'cash-remove'
 			md_bg_color:'#7d0204'
 			on_release:
-				app.root.registro('egreso') if app.root.ids.scr_manager.current=='ingre_egre' else root.registro('egresos',root.parent.panel_cls.text)
+				app.root.ids.manager.get_screen("ScreenFondo").registro('egresos',root.parent.panel_cls.text)
 
-<ContentGastos>
+<ContentGastos>:
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
@@ -123,13 +123,13 @@
         hint_text: "Monto"
         helper_text_mode: "on_error"
         helper_text: "Ingresa un valor válido"
-        on_text: self.error=False
+        #on_text: self.error=False
 
     MDTextField:
         id: descripcion
         error: False
-        hint_text: "Descripción" if app.root.ids.scr_manager.current=='ingre_egre' else 'Fecha'
+        hint_text: "Descripcion" if root.screen=='ScreenGastos' else "Fecha"
         helper_text_mode: "on_error"
         helper_text: "Ingresa un valor válido"
-        on_text: self.error=False
-		on_focus:if app.root.ids.scr_manager.current=='fondo': root.show_calendar()
+        #on_text: self.error=False
+		on_focus: if self.focus and not root.screen=='ScreenGastos':root.show_calendar()

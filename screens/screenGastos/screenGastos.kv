@@ -13,7 +13,7 @@
             MDIconButton:
                 icon:'menu'
                 pos_hint:{'x':.05,'top':1}
-                on_release:nav_drawer.set_state('open')
+                on_release:app.root.ids.nav_drawer.set_state('open')
             MDLabel:
                 id:lblUser
                 halign:'right'
@@ -52,7 +52,7 @@
                 text:'Ingreso'
                 icon:'cash-plus'
                 md_bg_color:'#7cd16f'
-                on_release:root.registro('ingresos');print(platform=='win')
+                on_release:root.registro('ingresos')
             MDFloatLayout:
                 size_hint_x:.5
             MDFillRoundFlatIconButton:
