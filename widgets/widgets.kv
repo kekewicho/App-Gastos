@@ -1,29 +1,45 @@
-<BtmSheet>:
+<GastoConcubinoItem>:
+	radius:10
+	elevation:0
+	style:"filled"
+	md_bg_color:"#dcf2f4" if self.who=='luis' else "#f4e5dc"
+	padding:'5dp'
+	spacing:'5dp'
+	MDBoxLayout:
+		orientation:'vertical'
+		size_hint_x:.3
+		MDLabel:
+			adaptive_height:True
+			font_style:'H6'
+			text:root.quien
+		MDLabel:
+			adaptive_height:True
+			font_style:'H6'
+			text:root.fecha
+	MDLabel:
+		adaptive_height:True
+		font_style:'H6'
+		text:"{:,.2f}".format(root.cantidad)
+		valign:'center'
+		halign:'center'
+
+
+<ConcubinosContent>:
 	orientation:'vertical'
 	padding:'20dp'
 	spacing:'10dp'
 	size_hint_y: None
-    height: "400dp"
+    height: "180dp"
 	MDTextField:
 		hint_text:'¿Quién lo pago?'
 		id:quien
 	MDTextField:
 		hint_text:'¿Cuánto pago?'
 		id:cantidad
-	MDBoxLayout:
-		MDFloatLayout:
-		MDRectangleFlatButton:
-			text: "Cancelar"
-			theme_text_color: "Custom"
-			text_color: "black"
-			line_color: "white"
-			on_release:app.custom_sheet.close()
-		MDRectangleFlatButton:
-			text: "Guardar"
-			theme_text_color: "Custom"
-			text_color: "#089cba"
-			line_color: "white"
-			on_release:app.addGastoConcubino()
+	MDTextField:
+		hint_text:'¿Cuándo lo pagó?'
+		id:fecha
+		on_focus: if self.focus:root.show_calendar()
 
 
 <Cards>:
