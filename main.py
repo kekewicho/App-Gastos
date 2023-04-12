@@ -4,7 +4,7 @@ from kivy.clock import Clock
 
 #from screens.screenConcubinos.screenConcubinos import screenConcubinos
 from screens.screenGastos.screenGastos import ScreenGastos
-#from screens.screenFondo.screenFondo import screenFondo
+from screens.screenFondo.screenFondo import ScreenFondo
 
 '''
 Nota importante: saber que para el caso de las cuentas quincenales, los ingresos y egresos si significan su valor literal
@@ -21,10 +21,11 @@ MDNavigationLayout:
 	ScreenManager:
 		id:manager
 		ScreenGastos:
-		#screenFondo:
+		ScreenFondo:
 		#screenConcubinos
 	MDNavigationDrawer:
 		id:nav_drawer
+		radius:0,10,10,0
 		MDBoxLayout:
 			orientation:'vertical'
 			MDFloatLayout:
@@ -42,7 +43,7 @@ MDNavigationLayout:
 				icon_color: "black"
 				on_release:
 					nav_drawer.set_state('close')
-					scr_manager.current='fondo'
+					manager.current='ScreenFondo'
 			MDRectangleFlatIconButton:
 				font_size:sp(20)
 				halign:'left'
@@ -56,7 +57,7 @@ MDNavigationLayout:
 				icon_color: "black"
 				on_release:
 					nav_drawer.set_state('close')
-					scr_manager.current='ingre_egre'
+					manager.current='ScreenGastos'
 			MDRectangleFlatIconButton:
 				font_size:sp(20)
 				halign:'left'
@@ -70,7 +71,7 @@ MDNavigationLayout:
 				icon_color: "black"
 				on_release:
 					nav_drawer.set_state('close')
-					scr_manager.current='concubinos'
+					manager.current='ScreenConcubinos'
 			MDFloatLayout:
 '''
 

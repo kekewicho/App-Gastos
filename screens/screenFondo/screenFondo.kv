@@ -1,13 +1,20 @@
-Screen:
-    name: 'fondoScreen'
-    MDFloatLayout:
+<ScreenFondo>:
+    name: 'ScreenFondo'
+    MDBoxLayout:
+        orientation:'vertical'
+        MDBoxLayout:
+            size_hint_y:None
+            height:self.minimum_height
+            MDIconButton:
+                icon:'menu'
+                on_release:app.root.ids.nav_drawer.set_state('open')
         ScrollView:
             MDGridLayout:
                 row_default_height:10
                 adaptive_height:True
                 cols:1
                 id:layout_fondo
-                padding:'15dp','60dp','15dp','15dp'
+                padding:'15dp'
                 spacing:'20dp'
                 MDAnchorLayout:
                     anchor_x:'center'
@@ -17,7 +24,7 @@ Screen:
                     MDLabel:
                         bold:True
                         halign:'center'
-                        text:'Total Ahorros: '
+                        text:'Total ahorrado: '+"${:,.2f}".format(root.ahorro)
                         id:ahorrado
                         font_size:sp(20)
                         theme_text_color: "Custom"
@@ -28,7 +35,4 @@ Screen:
                     text:'+ Nuevo prestamo'
                     size_hint_x:1
                     on_release:root.nuevo_prestamo()
-        MDIconButton:
-            icon:'menu'
-            pos_hint:{'x':.05,'top':1}
-            on_release:nav_drawer.set_state('open')
+        
