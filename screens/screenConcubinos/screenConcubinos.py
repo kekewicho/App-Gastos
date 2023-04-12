@@ -15,8 +15,9 @@ from kivy.clock import mainthread
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.label import MDLabel
-from widgets.widgets import BtmSheet,OPItem
+from widgets.widgets import ConcubinosContent
 from kivymd.uix.screen import MDScreen
+from kivymd.utils import asynckivy as ak
 
 class ScreenConcubinos(MDScreen):
     def addGastoConcubino(self, data):
@@ -26,6 +27,26 @@ class ScreenConcubinos(MDScreen):
         self.gastos_concubinos.append(data)
         self.add_gasto_widget(data, key)
         Snackbar(text='Gasto guardado con éxito').open()
+    
+    def addGastoConcubino(self):
+        def addGastoConcubino(object):
+            data = self.dialog.content_cls.get_data()
+            key = crud.db.child('concubinos/gastos').push(data)
+            self.dialog.content_cls.clean_fields()
+
+        def cancelar(object):
+            self.dialog.content_cls.clean_fields()
+            self.dialog.dismiss()
+
+        self.dialog = MDDialog(
+            title='Registrar gasto',
+            type='custom',
+            content_cls=ConcubinosContent(),
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Registrar', on_release=registrar)]
+        )
+        self.dialog.open()
 
     def update_balance(self):
         balance_luis, balance_joss = 0, 0
@@ -42,12 +63,13 @@ class ScreenConcubinos(MDScreen):
         if balance_joss == balance_luis:
             self.root.ids.balanceConcubino.text = 'Ahorita estan a mano, no pelien'
 
-    @mainthread
     def add_gasto_widget(self, data, key):
-        item = OPItem(monto="${:,.2f}".format(
-            data['cantidad']), descripcion=f'Pagó {data["quien"]}')
-        item.ids.btnDelete.on_release = lambda x=key: self.delete_gasto_concubino(x)
-        item.ids.btnEdit.on_release = lambda x=key: self.edit_gasto_concubino(x)
+        def add_gasto_widget():
+            item = OPItem(monto="${:,.2f}".format(
+                data['cantidad']), descripcion=f'Pagó {data["quien"]}')
+            item.ids.btnDelete.on_release = lambda x=key: self.delete_gasto_concubino(x)
+            item.ids.btnEdit.on_release = lambda x=key: self.edit_gasto_concubino(x)
+        ak.start(add_gasto_widget())
 
     def delete_gasto_concubino(self, key):
         print(key)

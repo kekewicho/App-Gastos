@@ -6,15 +6,47 @@ from kivy.properties import StringProperty
 from kivymd.app import MDApp
 from datetime import date
 
+class GastoConcubinoItem(MDCard):
+    quien=StringProperty()
+    cantidad=NumericProperty()
+    fecha=StringProperty()
 
-class BtmSheet(MDBoxLayout):
+    def __init__(self,quien:str,cantidad:float,fecha:str,*args):
+        super().__init__(*args)
+        self.quien=quien
+        self.cantidad=cantidad
+        self.fecha=fecha
+
+class ConcubinosContent(MDBoxLayout):
+    def __init__(self,*args):
+        super().__init__(*args)
+        self.ids.fecha.text=str(date.today())
+
     def get_data(self):
         data = {
             'quien': self.ids.quien.text,
-            'cantidad': float(self.ids.cantidad.text)
+            'cantidad': float(self.ids.cantidad.text),
+            'fecha':self.ids.fecha.text
         }
         return data
     
+    def clean_fields(self):
+        self.ids.fecha.text=str(date.today())
+        self.ids.quien.text=''
+        self.ids.cantidad.text=''
+
+    def show_calendar(self):
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
+        date_dialog.open()
+
+    def on_save(self, instance, value, date_range):
+        self.ids.fecha.text = value.strftime('%Y-%m-%d')
+
+    def on_cancel(self, instance, value):
+        pass
+
+
 class ContentNvoPrestamo(MDBoxLayout):
     pass
 
