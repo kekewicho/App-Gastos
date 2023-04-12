@@ -1,5 +1,6 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
+from kivy.clock import Clock
 
 #from screens.screenConcubinos.screenConcubinos import screenConcubinos
 from screens.screenGastos.screenGastos import ScreenGastos
@@ -78,7 +79,8 @@ class Appson(MDApp):
 		return Builder.load_string(KV)
 	
 	def on_start(self):
-		self.root.ids.manager.get_screen("ScreenGastos").ingre_egre_init_consulta()
+		Clock.schedule_once(lambda x:self.root.ids.manager.get_screen("ScreenGastos").ingre_egre_init_consulta(),2)
+		
 	
 if __name__=="__main__":
 	Appson().run()
