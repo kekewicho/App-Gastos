@@ -5,6 +5,7 @@ from kivy.clock import Clock
 #from screens.screenConcubinos.screenConcubinos import screenConcubinos
 from screens.screenGastos.screenGastos import ScreenGastos
 from screens.screenFondo.screenFondo import ScreenFondo
+from screens.screenConcubinos.screenConcubinos import ScreenConcubinos
 
 '''
 Nota importante: saber que para el caso de las cuentas quincenales, los ingresos y egresos si significan su valor literal
@@ -22,7 +23,7 @@ MDNavigationLayout:
 		id:manager
 		ScreenGastos:
 		ScreenFondo:
-		#screenConcubinos
+		ScreenConcubinos
 	MDNavigationDrawer:
 		id:nav_drawer
 		radius:0,10,10,0

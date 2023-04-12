@@ -18,10 +18,7 @@ from kivymd.uix.label import MDLabel
 from widgets.widgets import BtmSheet,OPItem
 from kivymd.uix.screen import MDScreen
 
-class screenConcubinos(MDScreen):
-    custom_sheet = MDCustomBottomSheet(screen=BtmSheet())
-    gastos_concubinos = []
-
+class ScreenConcubinos(MDScreen):
     def addGastoConcubino(self, data):
         data = self.custom_sheet.screen.get_data()
         self.custom_sheet.close()
