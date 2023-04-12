@@ -46,10 +46,8 @@ class ScreenConcubinos(MDScreen):
     def add_gasto_widget(self, data, key):
         item = OPItem(monto="${:,.2f}".format(
             data['cantidad']), descripcion=f'Pagó {data["quien"]}')
-        item.ids.btnDelete.on_release = lambda x=key: self.delete_gasto_concubino(
-            x)
-        item.ids.btnEdit.on_release = lambda x=key: self.edit_gasto_concubino(
-            x)
+        item.ids.btnDelete.on_release = lambda x=key: self.delete_gasto_concubino(x)
+        item.ids.btnEdit.on_release = lambda x=key: self.edit_gasto_concubino(x)
 
     def delete_gasto_concubino(self, key):
         print(key)

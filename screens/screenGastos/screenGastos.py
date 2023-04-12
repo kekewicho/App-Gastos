@@ -95,17 +95,14 @@ class ScreenGastos(MDScreen):
             self.dialog.content_cls.clean_fields()
             self.dialog.dismiss()
 
-        if self.dialog is None:
-            self.dialog = MDDialog(
-                title='Modificar gasto',
-                type='custom',
-                content_cls=ContentGastos(),
-                buttons=[
-                    bt(text='Cancelar', on_release=cancelar),
-                    bt(text='Registrar', on_release=registrar)]
-            )
-        else:
-            self.dialog.content_cls.title = 'Modificar gasto'
+        self.dialog = MDDialog(
+            title='Modificar gasto',
+            type='custom',
+            content_cls=ContentGastos(),
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Registrar', on_release=registrar)]
+        )
         self.dialog.content_cls.ids.monto.text = (
             wdg.monto).replace('$', '').replace(',', '')
         self.dialog.content_cls.ids.descripcion.text = wdg.descripcion

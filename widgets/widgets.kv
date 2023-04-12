@@ -46,14 +46,14 @@
 			id:btnDelete
 			on_release:
 				root.parent.remove_widget(root)
-				app.delete_op(root.key,root.op,root.monto)
+				app.root.ids.manager.get_screen("ScreenGastos").delete_opitem(root.key,root.op,root.monto)
 		MDIconButton:
 			icon:'pencil'
 			theme_icon_color: "Custom"
 			icon_color: '#3082a9'
 			id:btnEdit
 			on_release:
-				app.edit_op(root.key,root.op,root)
+				app.root.ids.manager.get_screen("ScreenGastos").edit_op(root.key,root.op,root)
     MDCardSwipeFrontBox:
 		ripple_behavior:True
 		focus_behavior: True
