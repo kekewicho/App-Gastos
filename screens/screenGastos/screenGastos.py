@@ -29,6 +29,7 @@ class ScreenGastos(MDScreen):
                     pass
                 else:
                     for value in data.each():
+                        await ak.sleep(0)
                         if operation == 'ingresos':
                             self.balance += eval(value.val()['monto'])
                             self.add_opitem('ingresos', value.val()['monto'], value.val()[
@@ -112,11 +113,11 @@ class ScreenGastos(MDScreen):
 
     def trasladar_quincena(self, direction):
         async def trasladar_quincena():
-            await ak.sleep(0)
             self.balance = 0
             a = crud.quince_actual('valor', direction, self.actual)
             self.ids.quincena.text = crud.translate_codigo(a)
             self.actual = a
+            await ak.sleep(0)
             for operation in ('ingresos', 'egresos'):
                 self.ids[operation].clear_widgets()
                 data = crud.db.child(
@@ -125,6 +126,7 @@ class ScreenGastos(MDScreen):
                     pass
                 else:
                     for value in data.each():
+                        await ak.sleep(0)
                         if operation == 'ingresos':
                             self.balance += eval(value.val()['monto'])
                             self.add_opitem('ingresos',value.val()['monto'],value.val()['descripcion'],value.key())
