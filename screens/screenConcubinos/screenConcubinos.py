@@ -38,12 +38,11 @@ class ScreenConcubinos(MDScreen):
 
     def addConcubinoItem(self, data):
         async def addConcubinoItem():
-            key = crud.db.child('concubinos/gastos').push(data)
             item=GastoConcubinoItem(
                     data['quien'],
                     data['cantidad'],
                     data['fecha'],
-                    key['name'])
+                    data['key'])
             self.ids.gastos_concubinos.add_widget(item)
             self.gastos.append(item)
         ak.start(addConcubinoItem())
@@ -51,6 +50,8 @@ class ScreenConcubinos(MDScreen):
     def addGastoConcubino(self):
         def addGastoConcubino(object):
             data = self.dialog.content_cls.get_data()
+            key = crud.db.child('concubinos/gastos').push(data)
+            data['key']=str(key['name'])
             self.addConcubinoItem(data)
             self.dialog.content_cls.clean_fields()
             self.update_balance()
