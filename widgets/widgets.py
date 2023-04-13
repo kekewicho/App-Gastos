@@ -10,12 +10,14 @@ class GastoConcubinoItem(MDCard):
     quien=StringProperty()
     cantidad=NumericProperty()
     fecha=StringProperty()
+    key=StringProperty()
 
-    def __init__(self,quien:str,cantidad:float,fecha:str,*args):
+    def __init__(self,quien:str,cantidad:float,fecha:str,key:str,*args):
         super().__init__(*args)
         self.quien=quien
         self.cantidad=cantidad
         self.fecha=fecha
+        self.key=key
 
 class ConcubinosContent(MDBoxLayout):
     def __init__(self,*args):
