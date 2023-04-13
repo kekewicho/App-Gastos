@@ -7,6 +7,7 @@ import crud
 from widgets.widgets import OPItem, ContentGastos
 from kivymd.utils import asynckivy as ak
 from kivy.properties import NumericProperty
+from kivymd.uix.snackbar import Snackbar
 
 
 class ScreenGastos(MDScreen):
@@ -23,8 +24,7 @@ class ScreenGastos(MDScreen):
             self.ids.quincena.text = quincena_actual
             # construyendo la pagina de las cuentas quincenales
             for operation in ('ingresos', 'egresos'):
-                data = crud.db.child(
-                    f'ingre_egre/{self.who}').child(self.actual).child(operation).get()
+                data = crud.db.child(f'ingre_egre/{self.who}').child(self.actual).child(operation).get()
                 if data.each() is None:
                     pass
                 else:
@@ -70,9 +70,12 @@ class ScreenGastos(MDScreen):
                 if monto_before == monto:
                     self.dialog.dismiss()
                     return None
-                crud.db.child(f'ingre_egre/{self.who}/{self.actual}/{operation}/{event}').update(
-                    {'monto': monto, 'descripcion': descripcion})
-                self.dialog.content_clsclean_fields()
+                try:
+                    crud.db.child(f'ingre_egre/{self.who}/{self.actual}/{operation}/{event}').update({'monto': monto, 'descripcion': descripcion})
+                except:
+                    Snackbar(text="¡Ocurrió un error!").open()
+                    return None
+                self.dialog.content_cls.clean_fields()
                 dif = abs(monto_before-eval(monto))
                 if monto_before > eval(monto):
                     if operation == 'egresos':
@@ -136,8 +139,11 @@ class ScreenGastos(MDScreen):
         def registrar(object):
             monto, descripcion = self.dialog.content_cls.get_data()
             if self.validacion('monto', monto) and self.validacion('descripcion', descripcion):
-                a = crud.db.child(f'ingre_egre/{self.who}').child(self.actual).child(
-                    operation).push({'monto': monto, 'descripcion': descripcion})
+                try:
+                    a = crud.db.child(f'ingre_egre/{self.who}').child(self.actual).child(operation).push({'monto': monto, 'descripcion': descripcion})
+                except:
+                    Snackbar(text="¡Ocurrió un error!").open()
+                    return None
                 self.add_opitem(operation, monto, descripcion, a['name'])
                 self.dialog.content_cls.clean_fields()
                 if operation == 'ingresos':

@@ -90,7 +90,11 @@ class ScreenFondo(MDScreen):
 
         def registrar(object):
             nombre = self.dialogNvoPrestamo.content_cls.ids.descripcion.text
-            crud.db.child(f'fondo/{self.who}').child('prestamos').child(nombre).set('')
+            try:
+                crud.db.child(f'fondo/{self.who}').child('prestamos').child(nombre).set('')
+            except:
+                Snackbar(text="¡Ocurrió un error!").open()
+                return None
             self.addItem(nombre,0)
             self.dialogNvoPrestamo.dismiss()
             clean_fields()
@@ -151,14 +155,22 @@ class ScreenFondo(MDScreen):
             if self.validacion('monto', monto) and self.validacion('descripcion', descripcion):
                 if 'tarjeta' in target:
                     saldo = self.prestamos_list['tarjeta']+eval(monto) if operation == 'ingresos' else self.prestamos_list['tarjeta']-eval(monto)
-                    crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(saldo)})
+                    try:    
+                        crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(saldo)})
+                    except:
+                        Snackbar(text="¡Ocurrió un error!").open()
+                        return None
                     clean_fields()
                     self.prestamos_list['tarjeta'] = saldo
                 else:
                     saldo = self.prestamos_list[target]+eval(monto) if operation == 'ingresos' else self.prestamos_list[target]-eval(monto)
                     tarjeta = self.prestamos_list['tarjeta']+eval(monto) if operation == 'ingresos' else self.prestamos_list['tarjeta']-eval(monto)
-                    crud.db.child(f'fondo/{self.who}/prestamos/{target}/{operation}').push({'fecha': descripcion, 'monto': monto})
-                    crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(tarjeta)})
+                    try:
+                        crud.db.child(f'fondo/{self.who}/prestamos/{target}/{operation}').push({'fecha': descripcion, 'monto': monto})
+                        crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(tarjeta)})
+                    except:
+                        Snackbar(text="¡Ocurrió un error!").open()
+                        return None
                     clean_fields()
                     self.prestamos_list[target] = saldo
                     self.prestamos_list['tarjeta'] = tarjeta

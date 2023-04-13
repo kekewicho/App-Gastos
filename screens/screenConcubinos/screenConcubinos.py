@@ -50,7 +50,11 @@ class ScreenConcubinos(MDScreen):
     def addGastoConcubino(self):
         def addGastoConcubino(object):
             data = self.dialog.content_cls.get_data()
-            key = crud.db.child('concubinos/gastos').push(data)
+            try:
+                key = crud.db.child('concubinos/gastos').push(data)
+            except:
+                Snackbar(text="¡Ocurrió un error!").open()
+                return None
             data['key']=str(key['name'])
             self.addConcubinoItem(data)
             self.dialog.content_cls.clean_fields()
