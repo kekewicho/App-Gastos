@@ -75,9 +75,9 @@ class ScreenConcubinos(MDScreen):
         async def update_balance():
             balance_luis, balance_joss = 0, 0
             for i in self.gastos:
-                if i.quien == 'joss':
+                if i.quien == 'Joss':
                     balance_joss += i.cantidad
-                if i.quien == 'luis':
+                if i.quien == 'Luis':
                     balance_luis += i.cantidad
             diferencia = abs(balance_luis-balance_joss)
             if balance_luis > balance_joss:
