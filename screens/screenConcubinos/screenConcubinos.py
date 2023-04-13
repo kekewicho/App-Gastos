@@ -22,8 +22,22 @@ from kivymd.utils import asynckivy as ak
 class ScreenConcubinos(MDScreen):
     gastos=[]
 
-    async def addConcubinoItem(self, data):
-        def addConcubinoItem():
+    def on_enter(self):
+        async def get_data():
+            data=crud.db.child('concubinos/gastos').get()
+            if data.each() is None:
+                return None
+            else:
+                for i in data.each():
+                    await ak.sleep(0)
+                    item=dict(i.val())
+                    item['key']=i.key()
+                    self.addConcubinoItem(item)
+            self.update_balance()
+        ak.start(get_data())
+
+    def addConcubinoItem(self, data):
+        async def addConcubinoItem():
             key = crud.db.child('concubinos/gastos').push(data)
             item=GastoConcubinoItem(
                     data['quien'],
@@ -32,7 +46,6 @@ class ScreenConcubinos(MDScreen):
                     key['name'])
             self.ids.gastos_concubinos.add_widget(item)
             self.gastos.append(item)
-            Snackbar(text='Gasto registrado con éxito').open()
         ak.start(addConcubinoItem())
     
     def addGastoConcubino(self):
@@ -40,6 +53,9 @@ class ScreenConcubinos(MDScreen):
             data = self.dialog.content_cls.get_data()
             self.addConcubinoItem(data)
             self.dialog.content_cls.clean_fields()
+            self.update_balance()
+            self.dialog.dismiss()
+            Snackbar(text='Gasto registrado con éxito').open()
 
         def cancelar(object):
             self.dialog.content_cls.clean_fields()
@@ -51,24 +67,26 @@ class ScreenConcubinos(MDScreen):
             content_cls=ConcubinosContent(),
             buttons=[
                 bt(text='Cancelar', on_release=cancelar),
-                bt(text='Registrar', on_release=registrar)]
+                bt(text='Registrar', on_release=addGastoConcubino)]
         )
         self.dialog.open()
 
     def update_balance(self):
-        balance_luis, balance_joss = 0, 0
-        for i in self.gastos_concubinos:
-            if i['quien'] == 'joss':
-                balance_joss += i['cantidad']
-            if i['quien'] == 'luis':
-                balance_luis += i['cantidad']
-        diferencia = abs(balance_luis-balance_joss)
-        if balance_luis > balance_joss:
-            self.root.ids.balanceConcubino.text = f'La yos le debe al yoryis {"${:,.2f}".format(diferencia)}'
-        if balance_joss > balance_luis:
-            self.root.ids.balanceConcubino.text = f'El yoryis le debe a la yos {"${:,.2f}".format(diferencia)}'
-        if balance_joss == balance_luis:
-            self.root.ids.balanceConcubino.text = 'Ahorita estan a mano, no pelien'
+        async def update_balance():
+            balance_luis, balance_joss = 0, 0
+            for i in self.gastos:
+                if i.quien == 'joss':
+                    balance_joss += i.cantidad
+                if i.quien == 'luis':
+                    balance_luis += i.cantidad
+            diferencia = abs(balance_luis-balance_joss)
+            if balance_luis > balance_joss:
+                self.ids.balanceConcubino.text = f'La yos le debe al yoryis {"${:,.2f}".format(diferencia)}'
+            if balance_joss > balance_luis:
+                self.ids.balanceConcubino.text = f'El yoryis le debe a la yos {"${:,.2f}".format(diferencia)}'
+            if balance_joss == balance_luis:
+                self.ids.balanceConcubino.text = 'Ahorita estan a mano, no pelien'
+        ak.start(update_balance())
 
     def delete_gasto_concubino(self, wdg):
         pass
