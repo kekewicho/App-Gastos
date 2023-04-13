@@ -15,23 +15,30 @@ from kivy.clock import mainthread
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.label import MDLabel
-from widgets.widgets import ConcubinosContent
+from widgets.widgets import ConcubinosContent,GastoConcubinoItem
 from kivymd.uix.screen import MDScreen
 from kivymd.utils import asynckivy as ak
 
 class ScreenConcubinos(MDScreen):
-    def addGastoConcubino(self, data):
-        data = self.custom_sheet.screen.get_data()
-        self.custom_sheet.close()
-        key = crud.db.child('concubinos/gastos').push(data)
-        self.gastos_concubinos.append(data)
-        self.add_gasto_widget(data, key)
-        Snackbar(text='Gasto guardado con éxito').open()
+    gastos=[]
+
+    async def addConcubinoItem(self, data):
+        def addConcubinoItem():
+            key = crud.db.child('concubinos/gastos').push(data)
+            item=GastoConcubinoItem(
+                    data['quien'],
+                    data['cantidad'],
+                    data['fecha'],
+                    key['name'])
+            self.ids.gastos_concubinos.add_widget(item)
+            self.gastos.append(item)
+            Snackbar(text='Gasto registrado con éxito').open()
+        ak.start(addConcubinoItem())
     
     def addGastoConcubino(self):
         def addGastoConcubino(object):
             data = self.dialog.content_cls.get_data()
-            key = crud.db.child('concubinos/gastos').push(data)
+            self.addConcubinoItem(data)
             self.dialog.content_cls.clean_fields()
 
         def cancelar(object):
@@ -63,16 +70,8 @@ class ScreenConcubinos(MDScreen):
         if balance_joss == balance_luis:
             self.root.ids.balanceConcubino.text = 'Ahorita estan a mano, no pelien'
 
-    def add_gasto_widget(self, data, key):
-        def add_gasto_widget():
-            item = OPItem(monto="${:,.2f}".format(
-                data['cantidad']), descripcion=f'Pagó {data["quien"]}')
-            item.ids.btnDelete.on_release = lambda x=key: self.delete_gasto_concubino(x)
-            item.ids.btnEdit.on_release = lambda x=key: self.edit_gasto_concubino(x)
-        ak.start(add_gasto_widget())
-
-    def delete_gasto_concubino(self, key):
-        print(key)
+    def delete_gasto_concubino(self, wdg):
+        pass
 
     def edit_gasto_concubino(self, key):
         pass
