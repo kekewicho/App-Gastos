@@ -14,10 +14,6 @@ sería un abono a la cuenta y viceversa.
 '''
 
 KV='''
-#:include screens\screenGastos\screenGastos.kv
-#:include screens\screenFondo\screenFondo.kv
-#:include screens\screenConcubinos\screenConcubinos.kv
-
 MDNavigationLayout:
 	ScreenManager:
 		id:manager

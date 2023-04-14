@@ -8,6 +8,10 @@ from widgets.widgets import OPItem, ContentGastos
 from kivymd.utils import asynckivy as ak
 from kivy.properties import NumericProperty
 from kivymd.uix.snackbar import Snackbar
+from kivy.lang import Builder
+import os
+
+Builder.load_file(os.path.join("screens","screenGastos","screenGastos.kv"))
 
 
 class ScreenGastos(MDScreen):
