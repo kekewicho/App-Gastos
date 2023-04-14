@@ -7,6 +7,7 @@ from kivymd.app import MDApp
 from datetime import date
 from kivy.animation import Animation
 from kivy.utils import platform
+import os
 
 class GastoConcubinoItem(MDCard):
     quien=StringProperty()
@@ -131,4 +132,4 @@ class OPItem(MDCardSwipe):
     op = StringProperty()
     key = StringProperty()
 
-Builder.load_file('widgets\widgets.kv')
+Builder.load_file(os.path.join("widgets","widgets.kv"))

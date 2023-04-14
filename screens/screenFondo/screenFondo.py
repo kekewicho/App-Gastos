@@ -1,25 +1,16 @@
-from kivy.lang import Builder
-from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton as bt
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.card import MDCard, MDCardSwipe
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelTwoLine
-from kivymd.uix.pickers import MDDatePicker
 from kivy.properties import NumericProperty,DictProperty
 from kivy.utils import platform
-from kivymd.uix.card import MDSeparator
 import crud
-from threading import Thread
-from kivy.clock import mainthread
-from kivymd.uix.bottomsheet import MDCustomBottomSheet
 from kivymd.uix.snackbar import Snackbar
-from kivymd.uix.label import MDLabel
 from kivymd.uix.screen import MDScreen
 from widgets.widgets import Cards,Buttons,ContentNvoPrestamo,ContentGastos
 from kivymd.utils import asynckivy as ak
 from datetime import date
 from kivy.clock import Clock
+from kivymd.uix.card import MDCard
 
 
 class ScreenFondo(MDScreen):
