@@ -6,6 +6,12 @@ from kivymd.uix.snackbar import Snackbar
 from widgets.widgets import ConcubinosContent,GastoConcubinoItem
 from kivymd.uix.screen import MDScreen
 from kivymd.utils import asynckivy as ak
+from kivymd.uix.label import MDLabel
+from kivy.lang import Builder
+import os
+
+Builder.load_file(os.path.join("screens","screenConcubinos","screenConcubinos.kv"))
+
 
 class ScreenConcubinos(MDScreen):
     gastos=[]
@@ -14,6 +20,14 @@ class ScreenConcubinos(MDScreen):
         async def get_data():
             data=crud.db.child('concubinos/gastos').get()
             if data.each() is None:
+                self.ids.gastos_concubinos.add_widget(
+                MDLabel(
+                    text='Aún no hay nada por aquí',
+                    halign='center',
+                    font_size='15sp',
+                    adaptive_height=True,
+                    theme_text_color= "Custom",
+                    text_color= '#727372')),
                 return None
             else:
                 for i in data.each():

@@ -11,6 +11,10 @@ from kivymd.utils import asynckivy as ak
 from datetime import date
 from kivy.clock import Clock
 from kivymd.uix.card import MDCard
+from kivy.lang import Builder
+import os
+
+Builder.load_file(os.path.join("screens","screenFondo","screenFondo.kv"))
 
 
 class ScreenFondo(MDScreen):
