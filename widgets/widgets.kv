@@ -1,0 +1,192 @@
+<GastoConcubinoItem>:
+	radius:10
+	elevation:0
+	style:"filled"
+	md_bg_color:"#e5e5e5"
+	padding:'15dp'
+	spacing:'15dp'
+	size_hint_y:None
+	height:self.minimum_height
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		height:data_box.height
+		size_hint_x:.15
+		MDIcon:
+			icon:'circle'
+			theme_text_color: "Custom"
+			text_color: "#478db3" if root.quien=='Luis' else "#b34782"
+	MDBoxLayout:
+		orientation:'vertical'
+		size_hint_y:None
+		height:self.minimum_height
+		id:data_box
+		spacing:'5dp'
+		MDLabel:
+			font_style:'H6'
+			text:"${:,.2f}".format(root.cantidad)
+			adaptive_height:True
+		MDLabel:
+			adaptive_height:True
+			text:"Pagó: "+root.quien
+			font_size:'13sp'
+			theme_text_color: "Custom"
+			text_color: "#5f5f5f"
+		MDLabel:
+			adaptive_height:True
+			text:"Fecha: "+root.fecha
+			font_size:'13sp'
+			theme_text_color: "Custom"
+			text_color: "#5f5f5f"
+
+
+<ConcubinosContent>:
+	orientation:'vertical'
+	padding:'20dp'
+	spacing:'10dp'
+	size_hint_y: None
+    height: "220dp"
+	MDBoxLayout:
+		padding:'5dp'
+		spacing:'5dp'
+		size_hint_y:None
+		height:self.minimum_height
+		id:boxChip
+		MDChip:
+			icon_check_color: (0, 0, 0, 1)
+    		text_color: (0, 0, 0, 0.5)
+    		_no_ripple_effect:True
+			active:True if root.who=='luis' else False
+			text: "Luis"
+			id:luis
+			on_release:
+				self.active=True
+				joss.active=False
+				root.quien='luis'
+		MDChip:
+			icon_check_color: (0, 0, 0, 1)
+    		text_color: (0, 0, 0, 0.5)
+    		_no_ripple_effect:True
+			active:True if root.who=='joss' else False
+			text: "Joss"
+			id:joss
+			on_release:
+				self.active=True
+				luis.active=False
+				root.quien='joss'
+	MDTextField:
+		hint_text:'¿Cuánto pago?'
+		id:cantidad
+	MDTextField:
+		hint_text:'¿Cuándo lo pagó?'
+		id:fecha
+		on_focus: if self.focus:root.show_calendar()
+
+
+<Cards>:
+	elevation:2
+	orientation: "vertical"
+	size_hint: .6, None
+	height: self.minimum_height
+	pos_hint: {"center_x": .5, "center_y": .5}
+	padding:"10dp"
+
+<OPItem>:
+    size_hint_y: None
+    height: '60sp'
+    radius:1
+    MDCardSwipeLayerBox:
+		MDIconButton:
+			icon:'delete'
+			theme_icon_color: "Custom"
+			icon_color: '#990000'
+			id:btnDelete
+			on_release:
+				root.parent.remove_widget(root)
+				app.root.ids.manager.get_screen("ScreenGastos").delete_opitem(root.key,root.op,root.monto)
+		MDIconButton:
+			icon:'pencil'
+			theme_icon_color: "Custom"
+			icon_color: '#3082a9'
+			id:btnEdit
+			on_release:
+				app.root.ids.manager.get_screen("ScreenGastos").edit_op(root.key,root.op,root)
+    MDCardSwipeFrontBox:
+		ripple_behavior:True
+		focus_behavior: True
+		radius:0
+		orientation:'vertical'
+		padding:15
+		spacing:5
+		on_release:root.open_card() if root.state=='closed' else root.close_card()
+		MDLabel:
+			text:root.monto
+			bold:True
+			font_size:'16sp'
+		MDLabel:
+			text:root.descripcion
+			shorten:True
+			font_size:'14sp'
+			theme_text_color: "Custom"
+			text_color: '#a7a7a7'
+
+<ContentNvoPrestamo>:
+	orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "60dp"
+
+    MDTextField:
+        id: descripcion
+        error:False
+        hint_text: "Descripción"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        on_text: self.error=False
+
+<Buttons>:
+	padding:2
+	spacing:15
+	size_hint_y:None
+	height:"60dp"
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Abono'
+			icon:'cash-plus'
+			md_bg_color:'#086001'
+			on_release:
+				app.root.ids.manager.get_screen("ScreenFondo").registro('ingresos',root.parent.panel_cls.text)
+	MDAnchorLayout:
+		anchor_x:'center'
+		anchor_y:'center'
+		MDFillRoundFlatIconButton:
+			text:'Préstamo'
+			icon:'cash-remove'
+			md_bg_color:'#7d0204'
+			on_release:
+				app.root.ids.manager.get_screen("ScreenFondo").registro('egresos',root.parent.panel_cls.text)
+
+<ContentGastos>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDTextField:
+        id: monto
+        error:False
+        hint_text: "Monto"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        #on_text: self.error=False
+
+    MDTextField:
+        id: descripcion
+        error: False
+        hint_text: "Descripcion" if root.screen=='ScreenGastos' else "Fecha"
+        helper_text_mode: "on_error"
+        helper_text: "Ingresa un valor válido"
+        #on_text: self.error=False
+		on_focus: if self.focus and not root.screen=='ScreenGastos':root.show_calendar()
