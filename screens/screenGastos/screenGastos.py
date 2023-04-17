@@ -17,31 +17,31 @@ Builder.load_file(os.path.join("screens","screenGastos","screenGastos.kv"))
 class ScreenGastos(MDScreen):
     balance = NumericProperty(0)
     actual = ''
-    who = 'luis' if platform != 'macosx' else 'joss'
+    who = 'luis' if not (platform in ['macosx','ios']) else 'joss'
     dialog = None
 
     def ingre_egre_init_consulta(self):
         async def ingre_egre_init_consulta():
-            self.ids.lblUser.text += 'Luisito!' if platform != 'macosx' else 'Joselincita! <3'
+            self.ids.lblUser.text += 'Luisito!' if not (platform in ['macosx','ios']) else 'Joselincita! <3'
             self.actual = crud.quince_actual('new')
             quincena_actual = crud.translate_codigo(self.actual)
             self.ids.quincena.text = quincena_actual
             # construyendo la pagina de las cuentas quincenales
             for operation in ('ingresos', 'egresos'):
-                data = crud.db.child(f'ingre_egre/{self.who}').child(self.actual).child(operation).get()
-                if data.each() is None:
+                data = crud.get(f'ingre_egre/{self.who}/{self.actual}/{operation}')
+                if data is None:
                     pass
                 else:
-                    for value in data.each():
+                    for key,value in data.items():
                         await ak.sleep(0)
                         if operation == 'ingresos':
-                            self.balance += eval(value.val()['monto'])
-                            self.add_opitem('ingresos', value.val()['monto'], value.val()[
-                                            'descripcion'], value.key())
+                            self.balance += eval(value['monto'])
+                            self.add_opitem('ingresos', value['monto'], value[
+                                            'descripcion'], key)
                         elif operation == 'egresos':
-                            self.balance -= eval(value.val()['monto'])
-                            self.add_opitem('egresos', value.val()['monto'], value.val()[
-                                            'descripcion'], value.key())
+                            self.balance -= eval(value['monto'])
+                            self.add_opitem('egresos', value['monto'], value[
+                                            'descripcion'], key)
         ak.start(ingre_egre_init_consulta())
 
     def add_opitem(self, operation, monto, descripcion, key):
@@ -57,8 +57,7 @@ class ScreenGastos(MDScreen):
         ak.start(add_opitem())
 
     def delete_opitem(self, event, op, monto):
-        crud.db.child(
-            f'ingre_egre/{self.who}/{self.actual}/{op}/{event}').remove()
+        crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
         monto = monto.replace('$', '').replace(',', '')
         if op == 'ingresos':
             self.balance -= eval(monto)
@@ -75,7 +74,7 @@ class ScreenGastos(MDScreen):
                     self.dialog.dismiss()
                     return None
                 try:
-                    crud.db.child(f'ingre_egre/{self.who}/{self.actual}/{operation}/{event}').update({'monto': monto, 'descripcion': descripcion})
+                    crud.update(f'ingre_egre/{self.who}/{self.actual}/{operation}/{event}',{'monto': monto, 'descripcion': descripcion})
                 except:
                     Snackbar(text="¡Ocurrió un error!").open()
                     return None
@@ -124,19 +123,18 @@ class ScreenGastos(MDScreen):
             await ak.sleep(0)
             for operation in ('ingresos', 'egresos'):
                 self.ids[operation].clear_widgets()
-                data = crud.db.child(
-                    f'ingre_egre/{self.who}').child(self.actual).child(operation).get()
-                if data.each() is None:
+                data = crud.get(f'ingre_egre/{self.who}/{self.actual}/{operation}')
+                if data is None:
                     pass
                 else:
-                    for value in data.each():
+                    for key,value in data.items():
                         await ak.sleep(0)
                         if operation == 'ingresos':
-                            self.balance += eval(value.val()['monto'])
-                            self.add_opitem('ingresos',value.val()['monto'],value.val()['descripcion'],value.key())
+                            self.balance += eval(value['monto'])
+                            self.add_opitem('ingresos',value['monto'],value['descripcion'],key)
                         elif operation == 'egresos':
-                            self.balance -= eval(value.val()['monto'])
-                            self.add_opitem('egresos',value.val()['monto'],value.val()['descripcion'],value.key())
+                            self.balance -= eval(value['monto'])
+                            self.add_opitem('egresos',value['monto'],value['descripcion'],key)
         ak.start(trasladar_quincena())
 
     def registro(self, operation):
@@ -144,7 +142,7 @@ class ScreenGastos(MDScreen):
             monto, descripcion = self.dialog.content_cls.get_data()
             if self.validacion('monto', monto) and self.validacion('descripcion', descripcion):
                 try:
-                    a = crud.db.child(f'ingre_egre/{self.who}').child(self.actual).child(operation).push({'monto': monto, 'descripcion': descripcion})
+                    a = crud.push(f'ingre_egre/{self.who}/{self.actual}/{operation}',{'monto': monto, 'descripcion': descripcion})
                 except:
                     Snackbar(text="¡Ocurrió un error!").open()
                     return None

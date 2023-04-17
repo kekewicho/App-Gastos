@@ -18,8 +18,8 @@ class ScreenConcubinos(MDScreen):
 
     def on_enter(self):
         async def get_data():
-            data=crud.db.child('concubinos/gastos').get()
-            if data.each() is None:
+            data=crud.get('concubinos/gastos')
+            if data is None:
                 self.ids.gastos_concubinos.add_widget(
                 MDLabel(
                     text='Aún no hay nada por aquí',
@@ -30,10 +30,10 @@ class ScreenConcubinos(MDScreen):
                     text_color= '#727372')),
                 return None
             else:
-                for i in data.each():
+                for key,i in data.items():
                     await ak.sleep(0)
-                    item=dict(i.val())
-                    item['key']=i.key()
+                    item=dict(i)
+                    item['key']=key
                     self.addConcubinoItem(item)
             self.update_balance()
         ak.start(get_data())
@@ -53,7 +53,7 @@ class ScreenConcubinos(MDScreen):
         def addGastoConcubino(object):
             data = self.dialog.content_cls.get_data()
             try:
-                key = crud.db.child('concubinos/gastos').push(data)
+                key = crud.push('concubinos/gastos',data)
             except:
                 Snackbar(text="¡Ocurrió un error!").open()
                 return None

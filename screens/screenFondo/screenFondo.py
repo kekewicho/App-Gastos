@@ -20,7 +20,7 @@ Builder.load_file(os.path.join("screens","screenFondo","screenFondo.kv"))
 class ScreenFondo(MDScreen):
     ahorro=NumericProperty(0)
     prestamos_list=DictProperty({"tarjeta":0})
-    who = 'luis' if platform != 'macosx' else 'joss'
+    who = 'luis' if not (platform in ['macosx','ios']) else 'joss'
     dialogNvoPrestamo=None
     dialogRegistro=None
 
@@ -30,23 +30,26 @@ class ScreenFondo(MDScreen):
     def fondo_init_consulta(self):
         async def fondo_init_consulta():
             # construyendo la pagina de ahorros
-            tarjeta = crud.db.child(f'fondo/{self.who}').child('tarjeta').get()
+            tarjeta = crud.get(f'fondo/{self.who}/{"tarjeta"}')
+            print(tarjeta)
             self.addItemTarjeta(tarjeta)
-            prestamos = crud.db.child(f'fondo/{self.who}/prestamos').get()
-            self.prestamos_list['tarjeta'] = eval(tarjeta.val())
-            for i in prestamos.each():
+            prestamos = crud.get(f'fondo/{self.who}/prestamos')
+            self.prestamos_list['tarjeta'] = eval(tarjeta)
+            if prestamos is None:return None
+            for key,value in prestamos.items():
                 saldo = 0
                 for j in ('ingresos', 'egresos'):
-                    op = crud.db.child(f'fondo/{self.who}').child('prestamos').child(i.key()).child(j).get()
-                    if op.each() is None:
+                    op = crud.get(f'fondo/{self.who}/prestamos/{key}/{j}')
+                    print(op)
+                    if op is None:
                         pass
                     else:
-                        for h in op.each():
+                        for key,value in op.items():
                             if j == 'ingresos':
-                                saldo += eval(h.val()['monto'])
-                            else: saldo -= eval(h.val()['monto'])
+                                saldo += eval(value['monto'])
+                            else: saldo -= eval(value['monto'])
                 await ak.sleep(0)
-                self.addItem(i.key(), saldo)
+                self.addItem(key, saldo)
         ak.start(fondo_init_consulta())
         
     def addItemTarjeta(self,data):
@@ -60,8 +63,8 @@ class ScreenFondo(MDScreen):
                     )
             )
             self.ids.layout_fondo.add_widget(card)
-        self.prestamos_list['tarjeta'] = float(data.val())
-        self.ahorro += abs(float(data.val()))
+        self.prestamos_list['tarjeta'] = float(data)
+        self.ahorro += abs(float(data))
         ak.start(addItemTarjeta())
 
     def addItem(self,nombre,saldo):
@@ -86,7 +89,7 @@ class ScreenFondo(MDScreen):
         def registrar(object):
             nombre = self.dialogNvoPrestamo.content_cls.ids.descripcion.text
             try:
-                crud.db.child(f'fondo/{self.who}').child('prestamos').child(nombre).set('')
+                crud.put(f'fondo/{self.who}/prestamos',{nombre:""})
             except:
                 Snackbar(text="¡Ocurrió un error!").open()
                 return None
@@ -151,7 +154,7 @@ class ScreenFondo(MDScreen):
                 if 'tarjeta' in target:
                     saldo = self.prestamos_list['tarjeta']+eval(monto) if operation == 'ingresos' else self.prestamos_list['tarjeta']-eval(monto)
                     try:    
-                        crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(saldo)})
+                        crud.update(f'fondo/{self.who}',{'tarjeta': str(saldo)})
                     except:
                         Snackbar(text="¡Ocurrió un error!").open()
                         return None
@@ -161,8 +164,8 @@ class ScreenFondo(MDScreen):
                     saldo = self.prestamos_list[target]+eval(monto) if operation == 'ingresos' else self.prestamos_list[target]-eval(monto)
                     tarjeta = self.prestamos_list['tarjeta']+eval(monto) if operation == 'ingresos' else self.prestamos_list['tarjeta']-eval(monto)
                     try:
-                        crud.db.child(f'fondo/{self.who}/prestamos/{target}/{operation}').push({'fecha': descripcion, 'monto': monto})
-                        crud.db.child(f'fondo/{self.who}').update({'tarjeta': str(tarjeta)})
+                        crud.push(f'fondo/{self.who}/prestamos/{target}/{operation}',{'fecha': descripcion, 'monto': monto})
+                        crud.update(f'fondo/{self.who}',{'tarjeta': str(tarjeta)})
                     except:
                         Snackbar(text="¡Ocurrió un error!").open()
                         return None
