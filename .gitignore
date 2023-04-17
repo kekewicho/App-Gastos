@@ -1,0 +1,6 @@
+#API KEYS
+*.env
+
+#Ignorar la cache generada por la app
+cache
+__pycache__
