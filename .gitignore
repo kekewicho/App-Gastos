@@ -4,3 +4,6 @@
 #Ignorar la cache generada por la app
 cache
 __pycache__
+
+#Ignorar las imagenes screenshots
+screenshots
