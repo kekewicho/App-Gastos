@@ -3,6 +3,8 @@ App para control de gastos conectada a base de datos en Firebase. Incluye manejo
 
 La app esta hecha como proyecto personal (Por lo que cubre mis necesidades) por lo cual uso algunos chistes locales (Just a joke) y actualmente se encuentra funcional en un iOS y Android, comunicadas por una base de datos Realtime Databse de [Firebase](https://firebase.google.com/ "Firebase Home Page").
 
+La interfaz está construida con [Kivy](https://github.com/kivy/kivy "Kivy Github")/[KivyMD](https://github.com/kivymd/KivyMD "KivyMD Github").
+
 ## Screenshots
 
 <div>
