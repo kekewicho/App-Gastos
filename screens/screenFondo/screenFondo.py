@@ -18,14 +18,18 @@ Builder.load_file(os.path.join("screens","screenFondo","screenFondo.kv"))
 
 
 class ScreenFondo(MDScreen):
+    built=False
+
     ahorro=NumericProperty(0)
     prestamos_list=DictProperty({"tarjeta":0})
     who = 'luis' if not (platform in ['macosx','ios']) else 'joss'
     dialogNvoPrestamo=None
     dialogRegistro=None
 
-    def on_enter(self):
-        Clock.schedule_once(lambda x:self.fondo_init_consulta(),0)
+    def on_pre_enter(self):
+        if self.built==False:
+            Clock.schedule_once(lambda x:self.fondo_init_consulta(),0)
+            self.built=True
 
     def fondo_init_consulta(self):
         async def fondo_init_consulta():
@@ -44,10 +48,10 @@ class ScreenFondo(MDScreen):
                     if op is None:
                         pass
                     else:
-                        for key,value in op.items():
+                        for _key,_value in op.items():
                             if j == 'ingresos':
-                                saldo += eval(value['monto'])
-                            else: saldo -= eval(value['monto'])
+                                saldo += eval(_value['monto'])
+                            else: saldo -= eval(_value['monto'])
                 await ak.sleep(0)
                 self.addItem(key, saldo)
         ak.start(fondo_init_consulta())
