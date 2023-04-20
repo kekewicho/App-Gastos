@@ -7,10 +7,13 @@ from kivymd.app import MDApp
 from datetime import date
 from kivy.utils import platform
 from kivymd.uix.behaviors import TouchBehavior
+from kivy.clock import Clock
+from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.label import MDLabel
 import os
 
 
-class GastoConcubinoItem(MDCard,TouchBehavior):
+class GastoConcubinoItem(MDCard, TouchBehavior):
     quien = StringProperty()
     cantidad = NumericProperty()
     fecha = StringProperty()
@@ -18,7 +21,8 @@ class GastoConcubinoItem(MDCard,TouchBehavior):
     descripcion = StringProperty()
 
     touch_down_time = 0
-
+    touch_up_time = 0
+    umbral = 0.5
 
     def __init__(self, quien: str, cantidad: float, fecha: str, key: str, descripcion: str, *args):
         super().__init__(*args)
@@ -33,21 +37,27 @@ class GastoConcubinoItem(MDCard,TouchBehavior):
         self.cantidad=float(data['cantidad'])
         self.fecha=str(data['fecha'])
         self.descripcion=str(data['descripcion'])
-    
-    def on_touch_up(self, touch):
-        screen=MDApp.get_running_app().root.ids.manager.get_screen("ScreenConcubinos")
-        if self.collide_point(*touch.pos):
-            super(GastoConcubinoItem, self).on_touch_up(touch)
-        else:
-            if touch.time_start - self.touch_down_time > 0.5:
-                screen.deleteItem(self)
-            else:
-                screen.updateItem(self)
 
     def on_touch_down(self, touch):
-        self.touch_down_time = touch.time_start
-        return super(GastoConcubinoItem, self).on_touch_down(touch)
+        if self.collide_point(*touch.pos):
+            self.touch_down_time = touch.time_start
+            self.event=Clock.schedule_once(self.long_touch,1)
+            return super(GastoConcubinoItem,self).on_touch_down(touch)
+        
+    def long_touch(self,*args):
+        Snackbar(MDLabel(text='long ouch')).open()
+    
+    def short_touch(self,*args):
+        Snackbar(MDLabel(text='short touch')).open()
 
+    def on_touch_up(self, touch):
+        if self.collide_point(*touch.pos):
+            self.touch_up_time = touch.time_end
+            duration = self.touch_up_time - self.touch_down_time
+            if duration < self.umbral:
+                self.event.cancel()
+                self.short_touch()
+            return super(GastoConcubinoItem,self).on_touch_up(touch)    
 
 class ConcubinosContent(MDBoxLayout):
     who = 'luis' if platform != 'macosx' else 'joss'
