@@ -1,5 +1,5 @@
 <GastoConcubinoItem>:
-	radius:10
+	radius:"17dp"
 	elevation:0
 	style:"filled"
 	md_bg_color:"#e5e5e5"
@@ -7,6 +7,7 @@
 	spacing:'15dp'
 	size_hint_y:None
 	height:self.minimum_height
+	ripple_behavior: True
 	MDAnchorLayout:
 		anchor_x:'center'
 		anchor_y:'center'
@@ -38,45 +39,48 @@
 			font_size:'13sp'
 			theme_text_color: "Custom"
 			text_color: "#5f5f5f"
+		MDLabel:
+			adaptive_height:True
+			text:"Descripcion: "+root.descripcion
+			font_size:'13sp'
+			theme_text_color: "Custom"
+			text_color: "#5f5f5f"
 
 
 <ConcubinosContent>:
 	orientation:'vertical'
-	padding:'20dp'
-	spacing:'10dp'
+	padding:'10dp'
 	size_hint_y: None
     height: "220dp"
 	MDBoxLayout:
-		padding:'5dp'
 		spacing:'5dp'
 		size_hint_y:None
 		height:self.minimum_height
 		id:boxChip
 		MDChip:
-			icon_check_color: (0, 0, 0, 1)
-    		text_color: (0, 0, 0, 0.5)
-    		_no_ripple_effect:True
-			active:True if root.who=='luis' else False
-			text: "Luis"
+			type:"filter"
 			id:luis
 			on_release:
 				self.active=True
 				joss.active=False
 				root.quien='luis'
+			MDChipText:
+				text: "Luis"
 		MDChip:
-			icon_check_color: (0, 0, 0, 1)
-    		text_color: (0, 0, 0, 0.5)
-    		_no_ripple_effect:True
-			active:True if root.who=='joss' else False
-			text: "Joss"
+			type:"filter"
 			id:joss
 			on_release:
 				self.active=True
 				luis.active=False
 				root.quien='joss'
+			MDChipText:
+				text: "Joss"
 	MDTextField:
 		hint_text:'¿Cuánto pago?'
 		id:cantidad
+	MDTextField:
+		hint_text:'¿Qué pagó?'
+		id:descripcion
 	MDTextField:
 		hint_text:'¿Cuándo lo pagó?'
 		id:fecha

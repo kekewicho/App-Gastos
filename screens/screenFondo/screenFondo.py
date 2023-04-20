@@ -12,6 +12,7 @@ from datetime import date
 from kivy.clock import Clock
 from kivymd.uix.card import MDCard
 from kivy.lang import Builder
+from kivymd.uix.label import MDLabel
 import os
 
 Builder.load_file(os.path.join("screens","screenFondo","screenFondo.kv"))
@@ -26,7 +27,7 @@ class ScreenFondo(MDScreen):
     dialogNvoPrestamo=None
     dialogRegistro=None
 
-    def on_pre_enter(self):
+    def on_enter(self):
         if self.built==False:
             Clock.schedule_once(lambda x:self.fondo_init_consulta(),0)
             self.built=True
@@ -95,7 +96,7 @@ class ScreenFondo(MDScreen):
             try:
                 crud.put(f'fondo/{self.who}/prestamos',{nombre:""})
             except:
-                Snackbar(text="¡Ocurrió un error!").open()
+                Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                 return None
             self.addItem(nombre,0)
             self.dialogNvoPrestamo.dismiss()
@@ -160,7 +161,7 @@ class ScreenFondo(MDScreen):
                     try:    
                         crud.update(f'fondo/{self.who}',{'tarjeta': str(saldo)})
                     except:
-                        Snackbar(text="¡Ocurrió un error!").open()
+                        Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                         return None
                     clean_fields()
                     self.prestamos_list['tarjeta'] = saldo
@@ -171,7 +172,7 @@ class ScreenFondo(MDScreen):
                         crud.push(f'fondo/{self.who}/prestamos/{target}/{operation}',{'fecha': descripcion, 'monto': monto})
                         crud.update(f'fondo/{self.who}',{'tarjeta': str(tarjeta)})
                     except:
-                        Snackbar(text="¡Ocurrió un error!").open()
+                        Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                         return None
                     clean_fields()
                     self.prestamos_list[target] = saldo

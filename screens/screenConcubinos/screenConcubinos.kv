@@ -23,11 +23,6 @@
                     halign:'right'
                     valign:'center'
                     text:"Concubino's house"
-            MDLabel:
-                halign:'center'
-                font_style:'Subtitle2'
-                text:'La yos le debe al yoryis 500 varo'
-                id:balanceConcubino
             MDCard:
                 elevation:1
                 size_hint_y:None
@@ -41,11 +36,19 @@
                     height:self.minimum_height
                     MDLabel:
                         text:'Gastos mutuos'
+                        valign:'center'
                         font_style:'H6'
-                        adaptive_height:True
-                    MDIconButton:
-                        icon:'plus'
+                        valign:'center'
+                    MDFlatButton:
+                        text: "Agregar"
+                        theme_text_color: "Custom"
+                        text_color: "#2d98d2"
                         on_release:root.addGastoConcubino()
+                MDLabel:
+                    halign:'center'
+                    font_style:'Subtitle2'
+                    adaptive_height:True
+                    id:balanceConcubino
             MDCard:
                 elevation:1
                 size_hint_y:None

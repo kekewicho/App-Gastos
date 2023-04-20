@@ -9,6 +9,7 @@ from kivymd.utils import asynckivy as ak
 from kivy.properties import NumericProperty
 from kivymd.uix.snackbar import Snackbar
 from kivy.lang import Builder
+from kivymd.uix.label import MDLabel
 import os
 
 Builder.load_file(os.path.join("screens","screenGastos","screenGastos.kv"))
@@ -76,7 +77,7 @@ class ScreenGastos(MDScreen):
                 try:
                     crud.update(f'ingre_egre/{self.who}/{self.actual}/{operation}/{event}',{'monto': monto, 'descripcion': descripcion})
                 except:
-                    Snackbar(text="¡Ocurrió un error!").open()
+                    Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                     return None
                 self.dialog.content_cls.clean_fields()
                 dif = abs(monto_before-eval(monto))
@@ -144,7 +145,7 @@ class ScreenGastos(MDScreen):
                 try:
                     a = crud.push(f'ingre_egre/{self.who}/{self.actual}/{operation}',{'monto': monto, 'descripcion': descripcion})
                 except:
-                    Snackbar(text="¡Ocurrió un error!").open()
+                    Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                     return None
                 self.add_opitem(operation, monto, descripcion, a['name'])
                 self.dialog.content_cls.clean_fields()
