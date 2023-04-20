@@ -58,7 +58,26 @@ class ScreenConcubinos(MDScreen):
         ak.start(addConcubinoItem())
     
     def deleteItem(self,item):
-        print(f"Pulsación larga en {item}")
+        def deleteItem(object):
+            crud.remove(f'concubinos/gastos/{item.key}')
+            self.ids.gastos_concubinos.remove_widget(item)
+            self.gastos.remove(item)
+            self.update_balance()
+            self.dialog.dismiss()
+            Snackbar(MDLabel(text='Gasto actualizado con éxito')).open()
+
+        def cancelar(object):
+            self.dialog.dismiss()
+
+        self.dialog = MDDialog(
+            title='¿Eliminar gasto?',
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Eliminar', on_release=deleteItem,theme_text_color="Custom",
+                        text_color="#a80000",)]
+        )
+        self.dialog.open()
+
 
     def updateItem(self, item):
         def updateItem(object):
@@ -79,7 +98,7 @@ class ScreenConcubinos(MDScreen):
             self.dialog.dismiss()
 
         self.dialog = MDDialog(
-            title='Actualizar',
+            title='Actualizar gasto',
             type='custom',
             content_cls=ConcubinosContent(
                 item.quien,

@@ -45,10 +45,10 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
             return super(GastoConcubinoItem,self).on_touch_down(touch)
         
     def long_touch(self,*args):
-        Snackbar(MDLabel(text='long ouch')).open()
+        MDApp.get_running_app().root.ids.manager.get_screen('ScreenConcubinos').deleteItem(self)
     
     def short_touch(self,*args):
-        Snackbar(MDLabel(text='short touch')).open()
+        MDApp.get_running_app().root.ids.manager.get_screen('ScreenConcubinos').updateItem(self)
 
     def on_touch_up(self, touch):
         if self.collide_point(*touch.pos):
