@@ -24,7 +24,7 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
     touch_up_time = 0
     umbral = 0.5
 
-    last_touch_id=StringProperty()
+    last_touch_id=None
 
     def __init__(self, quien: str, cantidad: float, fecha: str, key: str, descripcion: str, *args):
         super().__init__(*args)
