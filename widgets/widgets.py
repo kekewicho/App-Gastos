@@ -53,12 +53,12 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
         MDApp.get_running_app().root.ids.manager.get_screen('ScreenConcubinos').updateItem(self)
 
     def on_touch_up(self, touch):
-        if self.last_touch_id==touch.id:return None
+        if self.last_touch_id==touch.uid:return None
         if self.collide_point(*touch.pos):
             self.touch_up_time = touch.time_end
             duration = self.touch_up_time - self.touch_down_time
             if duration < self.umbral:
-                self.last_touch_id=touch.id
+                self.last_touch_id=touch.uid
                 self.event.cancel()
                 self.short_touch()
             return super(GastoConcubinoItem,self).on_touch_up(touch)    
