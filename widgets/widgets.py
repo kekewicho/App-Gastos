@@ -61,7 +61,7 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
                 self.last_touch_id=touch.uid
                 self.event.cancel()
                 self.short_touch()
-            return super(GastoConcubinoItem,self).on_touch_up(touch)    
+                return super(GastoConcubinoItem,self).on_touch_up(touch)    
 
 class ConcubinosContent(MDBoxLayout):
     who = 'luis' if platform != 'macosx' else 'joss'
