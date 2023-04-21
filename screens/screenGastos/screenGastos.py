@@ -10,9 +10,14 @@ from kivy.properties import NumericProperty
 from kivymd.uix.snackbar import Snackbar
 from kivy.lang import Builder
 from kivymd.uix.label import MDLabel
+from kivymd.uix.tab import MDTabsBase
+from kivy.uix.scrollview import ScrollView
 import os
 
 Builder.load_file(os.path.join("screens","screenGastos","screenGastos.kv"))
+
+class Tabs(ScrollView, MDTabsBase):
+    pass
 
 
 class ScreenGastos(MDScreen):

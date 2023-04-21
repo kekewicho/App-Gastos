@@ -8,8 +8,7 @@ from datetime import date
 from kivy.utils import platform
 from kivymd.uix.behaviors import TouchBehavior
 from kivy.clock import Clock
-from kivymd.uix.snackbar import Snackbar
-from kivymd.uix.label import MDLabel
+from kivymd.uix.tab import MDTabsBase
 import os
 
 
@@ -160,6 +159,7 @@ class OPItem(MDCardSwipe):
     descripcion = StringProperty()
     op = StringProperty()
     key = StringProperty()
+
 
 
 Builder.load_file(os.path.join("widgets", "widgets.kv"))

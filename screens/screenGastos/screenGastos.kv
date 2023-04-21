@@ -61,25 +61,17 @@
                 md_bg_color:'#bf1336'
                 on_release:root.registro('egresos')
             MDFloatLayout:
-        MDBoxLayout:
-            spacing:15
-            MDBoxLayout:
-                orientation:'vertical'
-                spacing:15
-                MDLabel:
-                    text:'Ingresos'
-                    halign:'center'
-                    size_hint_y:.1
-                ScrollView:
-                    MDList:
-                        id:ingresos
-            MDBoxLayout:
-                orientation:'vertical'
-                spacing:15
-                MDLabel:
-                    text:'Egresos'
-                    halign:'center'
-                    size_hint_y:.1
-                ScrollView:
-                    MDList:
-                        id:egresos
+        MDTabs:
+            tab_hint_x:True
+            Tabs:
+                title:'Ingresos'
+                MDGridLayout:
+                    adaptive_height:True
+                    cols:1
+                    id:ingresos
+            Tabs:
+                title:'Egresos'
+                MDGridLayout:
+                    adaptive_height:True
+                    cols:1
+                    id:egresos
