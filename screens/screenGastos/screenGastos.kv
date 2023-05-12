@@ -63,6 +63,13 @@
             MDFloatLayout:
         MDTabs:
             tab_hint_x:True
+            background_color:'#ffffff'
+            text_color_normal:(0,0,0,.5)
+            text_color_active:(0,0,0,1)
+            no_ripple_effect:False
+            indicator_color:"#7cd16f"
+            on_tab_switch:
+                self.indicator_color="#bf1336" if self.get_current_tab().title=="Ingresos" else '#7cd16f'
             Tabs:
                 title:'Ingresos'
                 MDGridLayout:

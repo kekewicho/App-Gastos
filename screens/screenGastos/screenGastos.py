@@ -62,13 +62,27 @@ class ScreenGastos(MDScreen):
             self.ids[operation].add_widget(item)
         ak.start(add_opitem())
 
-    def delete_opitem(self, event, op, monto):
-        crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
-        monto = monto.replace('$', '').replace(',', '')
-        if op == 'ingresos':
-            self.balance -= eval(monto)
-        if op == 'egresos':
-            self.balance += eval(monto)
+    def delete_opitem(self, item, event, op, monto):
+        def deleteItem(object):
+            crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
+            monto = monto.replace('$', '').replace(',', '')
+            if op == 'ingresos':
+                self.balance -= eval(monto)
+            if op == 'egresos':
+                self.balance += eval(monto)
+            self.ids[op].remove_widget(item)
+
+        def cancelar(object):
+            self.dialog.dismiss()
+
+        self.dialog = MDDialog(
+            title='¿Eliminar operación?',
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Eliminar', on_release=deleteItem,theme_text_color="Custom",
+                        text_color="#a80000",)]
+        )
+        self.dialog.open()
 
     def edit_op(self, event, operation, wdg):
         monto_before = eval((wdg.monto).replace('$', '').replace(',', ''))

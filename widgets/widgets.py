@@ -21,7 +21,7 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
 
     touch_down_time = 0
     touch_up_time = 0
-    umbral = 0.5
+    umbral = 0.7
 
     last_touch_id=None
 
@@ -154,11 +154,39 @@ class ContentGastos(MDBoxLayout):
             self.setToday()
 
 
-class OPItem(MDCardSwipe):
+class OPItem(MDCard, TouchBehavior):
     monto = StringProperty()
     descripcion = StringProperty()
     op = StringProperty()
     key = StringProperty()
+    
+    touch_down_time = 0
+    touch_up_time = 0
+    umbral = 0.7
+    last_touch_id=None
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.touch_down_time = touch.time_start
+            self.event=Clock.schedule_once(self.long_touch,1)
+            return super(OPItem,self).on_touch_down(touch)
+        
+    def long_touch(self,*args):
+        MDApp.get_running_app().root.ids.manager.get_screen('ScreenGastos').delete_opitem(self,self.key,self.op,self.monto)
+    
+    def short_touch(self,*args):
+        MDApp.get_running_app().root.ids.manager.get_screen('ScreenGastos').edit_op(self.key,self.op,self)
+
+    def on_touch_up(self, touch):
+        if self.last_touch_id==touch.uid:return None
+        if self.collide_point(*touch.pos):
+            self.touch_up_time = touch.time_end
+            duration = self.touch_up_time - self.touch_down_time
+            if duration < self.umbral:
+                self.last_touch_id=touch.uid
+                self.event.cancel()
+                self.short_touch()
+                return super(OPItem,self).on_touch_up(touch)
 
 
 

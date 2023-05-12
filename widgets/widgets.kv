@@ -96,43 +96,28 @@
 	padding:"10dp"
 
 <OPItem>:
-    size_hint_y: None
-    height: '60sp'
-    radius:1
-    MDCardSwipeLayerBox:
-		MDIconButton:
-			icon:'delete'
-			theme_icon_color: "Custom"
-			icon_color: '#990000'
-			id:btnDelete
-			on_release:
-				root.parent.remove_widget(root)
-				app.root.ids.manager.get_screen("ScreenGastos").delete_opitem(root.key,root.op,root.monto)
-		MDIconButton:
-			icon:'pencil'
-			theme_icon_color: "Custom"
-			icon_color: '#3082a9'
-			id:btnEdit
-			on_release:
-				app.root.ids.manager.get_screen("ScreenGastos").edit_op(root.key,root.op,root)
-    MDCardSwipeFrontBox:
-		ripple_behavior:True
-		focus_behavior: True
-		radius:0
-		orientation:'vertical'
-		padding:15
-		spacing:5
-		on_release:root.open_card() if root.state=='closed' else root.close_card()
-		MDLabel:
-			text:root.monto
-			bold:True
-			font_size:'16sp'
-		MDLabel:
-			text:root.descripcion
-			shorten:True
-			font_size:'14sp'
-			theme_text_color: "Custom"
-			text_color: '#a7a7a7'
+    radius:0
+	elevation:0
+	style:"filled"
+	padding:'15dp'
+	spacing:'5dp'
+	size_hint_y:None
+	height:"70dp"
+	ripple_behavior: True
+	MDLabel:
+		text:root.descripcion
+		valign:'center'
+		halign:'left'
+		font_size:'13sp'
+		theme_text_color: "Custom"
+		text_color: "#414141"
+		size_hint_x:.7
+	MDLabel:
+		font_style:'H6'
+		text:root.monto
+		size_hint_x:.3
+		valign:'center'
+		halign:'right'
 
 <ContentNvoPrestamo>:
 	orientation: "vertical"
@@ -194,4 +179,3 @@
         helper_text: "Ingresa un valor válido"
         #on_text: self.error=False
 		on_focus: if self.focus and not root.screen=='ScreenGastos':root.show_calendar()
-
