@@ -65,12 +65,13 @@ class ScreenGastos(MDScreen):
     def delete_opitem(self, item, event, op, monto):
         def deleteItem(object):
             crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
-            monto = monto.replace('$', '').replace(',', '')
+            monto_ = monto.replace('$', '').replace(',', '')
             if op == 'ingresos':
-                self.balance -= eval(monto)
+                self.balance -= eval(monto_)
             if op == 'egresos':
-                self.balance += eval(monto)
+                self.balance += eval(monto_)
             self.ids[op].remove_widget(item)
+            self.dialog.dismiss()
 
         def cancelar(object):
             self.dialog.dismiss()
