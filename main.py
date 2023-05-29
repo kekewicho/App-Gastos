@@ -1,8 +1,9 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.clock import Clock
+from kivy.properties import DictProperty
 
-#from screens.screenConcubinos.screenConcubinos import screenConcubinos
+# from screens.screenConcubinos.screenConcubinos import screenConcubinos
 from screens.screenGastos.screenGastos import ScreenGastos
 from screens.screenFondo.screenFondo import ScreenFondo
 from screens.screenConcubinos.screenConcubinos import ScreenConcubinos
@@ -13,7 +14,7 @@ pero para el caso de las cuentas del ahorro, el calculo si se hace en referencia
 sería un abono a la cuenta y viceversa.
 '''
 
-KV='''
+KV = '''
 MDNavigationLayout:
 	ScreenManager:
 		id:manager
@@ -72,13 +73,35 @@ MDNavigationLayout:
 			MDFloatLayout:
 '''
 
+
 class Appson(MDApp):
-	def build(self):
-		return Builder.load_string(KV)
-	
-	def on_start(self):
-		Clock.schedule_once(lambda x:self.root.ids.manager.get_screen("ScreenGastos").ingre_egre_init_consulta(),2)
-		
-	
-if __name__=="__main__":
-	Appson().run()
+    data = DictProperty()
+
+    def build(self):
+        #self.data = {
+        #    'Ingreso': [
+		#		'cash-plus',
+		#		'on_release',lambda x:
+		#		],
+        #    'Egreso': [
+		#		'cash-remove',
+		#		'on_release',lambda x:
+		#		],
+		#	'Cargar frecuentes':[
+		#		'briefcase-account',
+		#		'on_release',lambda x:
+		#		],
+        #    'Gasto recurrente':[
+		#		'credit-card-clock',
+		#		'on_release',lambda x:
+		#		],
+        #}
+        return Builder.load_string(KV)
+
+    def on_start(self):
+        Clock.schedule_once(lambda x: self.root.ids.manager.get_screen(
+            "ScreenGastos").ingre_egre_init_consulta(), 2)
+
+
+if __name__ == "__main__":
+    Appson().run()

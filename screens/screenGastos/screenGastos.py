@@ -10,9 +10,14 @@ from kivy.properties import NumericProperty
 from kivymd.uix.snackbar import Snackbar
 from kivy.lang import Builder
 from kivymd.uix.label import MDLabel
+from kivymd.uix.tab import MDTabsBase
+from kivy.uix.scrollview import ScrollView
 import os
 
 Builder.load_file(os.path.join("screens","screenGastos","screenGastos.kv"))
+
+class Tabs(ScrollView, MDTabsBase):
+    pass
 
 
 class ScreenGastos(MDScreen):
@@ -57,13 +62,28 @@ class ScreenGastos(MDScreen):
             self.ids[operation].add_widget(item)
         ak.start(add_opitem())
 
-    def delete_opitem(self, event, op, monto):
-        crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
-        monto = monto.replace('$', '').replace(',', '')
-        if op == 'ingresos':
-            self.balance -= eval(monto)
-        if op == 'egresos':
-            self.balance += eval(monto)
+    def delete_opitem(self, item, event, op, monto):
+        def deleteItem(object):
+            crud.remove(f'ingre_egre/{self.who}/{self.actual}/{op}/{event}')
+            monto_ = monto.replace('$', '').replace(',', '')
+            if op == 'ingresos':
+                self.balance -= eval(monto_)
+            if op == 'egresos':
+                self.balance += eval(monto_)
+            self.ids[op].remove_widget(item)
+            self.dialog.dismiss()
+
+        def cancelar(object):
+            self.dialog.dismiss()
+
+        self.dialog = MDDialog(
+            title='¿Eliminar operación?',
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Eliminar', on_release=deleteItem,theme_text_color="Custom",
+                        text_color="#a80000",)]
+        )
+        self.dialog.open()
 
     def edit_op(self, event, operation, wdg):
         monto_before = eval((wdg.monto).replace('$', '').replace(',', ''))
