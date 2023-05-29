@@ -78,24 +78,24 @@ class Appson(MDApp):
     data = DictProperty()
 
     def build(self):
-        #self.data = {
-        #    'Ingreso': [
-		#		'cash-plus',
-		#		'on_release',lambda x:
-		#		],
-        #    'Egreso': [
-		#		'cash-remove',
-		#		'on_release',lambda x:
-		#		],
-		#	'Cargar frecuentes':[
-		#		'briefcase-account',
-		#		'on_release',lambda x:
-		#		],
-        #    'Gasto recurrente':[
-		#		'credit-card-clock',
-		#		'on_release',lambda x:
-		#		],
-        #}
+        self.data = {
+            'Ingreso': [
+				'cash-plus',
+				#'on_release',lambda x:
+				],
+            'Egreso': [
+				'cash-remove',
+				#'on_release',lambda x:
+				],
+			'Cargar frecuentes':[
+				'briefcase-account',
+				#'on_release',lambda x:
+				],
+            'Gasto recurrente':[
+				'credit-card-clock',
+				#'on_release',lambda x:
+				],
+        }
         return Builder.load_string(KV)
 
     def on_start(self):
