@@ -45,22 +45,22 @@
             font_size:sp(20)
             theme_text_color: "Custom"
             text_color: "red" if '-' in self.text else 'black'
-        MDBoxLayout:
-            size_hint_y:.1
-            MDFloatLayout:
-            MDFillRoundFlatIconButton:
-                text:'Ingreso'
-                icon:'cash-plus'
-                md_bg_color:'#7cd16f'
-                on_release:root.registro('ingresos')
-            MDFloatLayout:
-                size_hint_x:.5
-            MDFillRoundFlatIconButton:
-                text:'Egreso'
-                icon:'cash-remove'
-                md_bg_color:'#bf1336'
-                on_release:root.registro('egresos')
-            MDFloatLayout:
+        #MDBoxLayout:
+        #    size_hint_y:.1
+        #    MDFloatLayout:
+        #    MDFillRoundFlatIconButton:
+        #        text:'Ingreso'
+        #        icon:'cash-plus'
+        #        md_bg_color:'#7cd16f'
+        #        on_release:root.registro('ingresos')
+        #    MDFloatLayout:
+        #        size_hint_x:.5
+        #    MDFillRoundFlatIconButton:
+        #        text:'Egreso'
+        #        icon:'cash-remove'
+        #        md_bg_color:'#bf1336'
+        #        on_release:root.registro('egresos')
+        #    MDFloatLayout:
         MDTabs:
             tab_hint_x:True
             background_color:'#ffffff'
@@ -82,3 +82,8 @@
                     adaptive_height:True
                     cols:1
                     id:egresos
+    MDFloatingActionButtonSpeedDial:
+        id: speed_dial
+        data: app.data
+        hint_animation: False
+        right_pad: False
