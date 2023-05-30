@@ -81,19 +81,15 @@ class Appson(MDApp):
         self.data = {
             'Ingreso': [
 				'cash-plus',
-				#'on_release',lambda x:
+				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registro('ingresos')
 				],
             'Egreso': [
 				'cash-remove',
-				#'on_release',lambda x:
+				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registro('egresos')
 				],
-			'Cargar frecuentes':[
-				'briefcase-account',
-				#'on_release',lambda x:
-				],
-            'Gasto recurrente':[
+            'Gasto diferido':[
 				'credit-card-clock',
-				#'on_release',lambda x:
+				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registroDiferido()
 				],
         }
         return Builder.load_string(KV)

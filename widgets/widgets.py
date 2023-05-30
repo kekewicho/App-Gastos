@@ -1,6 +1,6 @@
 from kivy.lang import Builder
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.card import MDCard, MDCardSwipe
+from kivymd.uix.card import MDCard
 from kivymd.uix.pickers import MDDatePicker
 from kivy.properties import StringProperty, NumericProperty
 from kivymd.app import MDApp
@@ -8,7 +8,7 @@ from datetime import date
 from kivy.utils import platform
 from kivymd.uix.behaviors import TouchBehavior
 from kivy.clock import Clock
-from kivymd.uix.tab import MDTabsBase
+import crud
 import os
 
 
@@ -188,6 +188,27 @@ class OPItem(MDCard, TouchBehavior):
                 self.short_touch()
                 return super(OPItem,self).on_touch_up(touch)
 
+class DiferidoContent(MDBoxLayout):
+    periodicidad=StringProperty('mensual')
+
+    def clean_fields(self):
+        self.ids.descripcion.text=''
+        self.ids.cantidad.text=''
+        self.ids.periodos.text=''
+        self.ids.aPartir.text=''
+
+    def pagoPorPeriodo(self):
+        return round(float(self.ids.cantidad.text)/int(self.ids.periodos.text),1)
+    
+    def getQuincenas(self):
+        quincenas=[]
+        quincena=self.ids.aPartir.text
+        for period in range(int(self.ids.periodos.text)):
+            quincenas.append(quincena)
+            quincena=crud.quince_actual('valor','next',quincena)
+            if self.periodicidad=='mensual':quincena=crud.quince_actual('valor','next',quincena)
+        
+        return quincenas
 
 
 Builder.load_file(os.path.join("widgets", "widgets.kv"))

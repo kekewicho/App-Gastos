@@ -179,3 +179,44 @@
         helper_text: "Ingresa un valor válido"
         #on_text: self.error=False
 		on_focus: if self.focus and not root.screen=='ScreenGastos':root.show_calendar()
+
+<DiferidoContent>:
+	orientation:'vertical'
+	padding:'10dp'
+	size_hint_y: None
+    height: "300dp"
+	MDBoxLayout:
+		spacing:'5dp'
+		size_hint_y:None
+		height:self.minimum_height
+		id:boxChip
+		MDChip:
+			type:"filter"
+			id:quincenal
+			on_release:
+				self.active=True
+				mensual.active=False
+				root.periodicidad='quincenal'
+			MDChipText:
+				text: "Quincenal"
+		MDChip:
+			type:"filter"
+			id:mensual
+			on_release:
+				self.active=True
+				quincenal.active=False
+				root.periodicidad='mensual'
+			MDChipText:
+				text: "Mensual"
+	MDTextField:
+		hint_text:'¿Qué pagaste?'
+		id:descripcion
+	MDTextField:
+		hint_text:'Cantidad a diferir (total)'
+		id:cantidad
+	MDTextField:
+		hint_text:'¿Por cuantos periodos?'
+		id:periodos
+	MDTextField:
+		hint_text:'¿A partir de que quincena?'
+		id:aPartir

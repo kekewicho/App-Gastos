@@ -4,7 +4,7 @@ from kivymd.uix.button import MDFlatButton as bt
 from kivy.utils import platform
 from kivymd.uix.card import MDSeparator
 import crud
-from widgets.widgets import OPItem, ContentGastos
+from widgets.widgets import OPItem, ContentGastos, DiferidoContent
 from kivymd.utils import asynckivy as ak
 from kivy.properties import NumericProperty
 from kivymd.uix.snackbar import Snackbar
@@ -182,6 +182,7 @@ class ScreenGastos(MDScreen):
             self.dialog.content_cls.clean_fields()
             self.dialog.dismiss()
 
+        self.ids.speed_dial.close_stack()
         self.dialog = MDDialog(
             title='Registrar '+operation,
             type='custom',
@@ -207,3 +208,37 @@ class ScreenGastos(MDScreen):
                 return True
             else:
                 False
+
+
+    def registroDiferido(self):
+        def registrar(object):
+            pago=self.dialog.content_cls.pagoPorPeriodo()
+            descripcion=self.dialog.content_cls.ids.descripcion.text
+            counter=1
+            quinceList=self.dialog.content_cls.getQuincenas()
+            cantQuince=len(quinceList)
+            for quincena in quinceList:
+                data={
+                    'descripcion':f'{descripcion} {counter}/{cantQuince}',
+                    'monto':str(pago)
+                }
+                registro=crud.push(f'ingre_egre/{self.who}/{quincena}/egresos',data)
+                counter+=1
+
+                if quincena==self.actual:
+                    self.add_opitem('egresos',str(pago),f'{descripcion} {counter}/{cantQuince}',registro['name'])
+
+        def cancelar(object):
+            self.dialog.content_cls.clean_fields()
+            self.dialog.dismiss()
+
+        self.ids.speed_dial.close_stack()
+        self.dialog = MDDialog(
+            title='Registrar diferido',
+            type='custom',
+            content_cls=DiferidoContent(),
+            buttons=[
+                bt(text='Cancelar', on_release=cancelar),
+                bt(text='Registrar', on_release=registrar)]
+        )
+        self.dialog.open()
