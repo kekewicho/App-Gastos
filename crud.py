@@ -21,11 +21,6 @@ def push(child,data):
     response = requests.post(url, json=data)
     return response.json()
 
-def put(child,data):
-    url = f"{config['databaseURL']}/{child}.json"
-    response = requests.put(url, json=data)
-    return response.json()
-
 # Función para obtener un registro específico de la base de datos
 def get(child):
     url = f"{config['databaseURL']}/{child}.json"

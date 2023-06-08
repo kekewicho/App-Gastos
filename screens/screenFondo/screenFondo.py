@@ -94,7 +94,7 @@ class ScreenFondo(MDScreen):
         def registrar(object):
             nombre = self.dialogNvoPrestamo.content_cls.ids.descripcion.text
             try:
-                crud.put(f'fondo/{self.who}/prestamos',{nombre:""})
+                crud.update(f'fondo/{self.who}/prestamos',{nombre:""})
             except:
                 Snackbar(MDLabel(text="¡Ocurrió un error!")).open()
                 return None
