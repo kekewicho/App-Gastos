@@ -7,6 +7,7 @@ from kivy.properties import DictProperty
 from screens.screenGastos.screenGastos import ScreenGastos
 from screens.screenFondo.screenFondo import ScreenFondo
 from screens.screenConcubinos.screenConcubinos import ScreenConcubinos
+from screens.screenConfiguracion.screenConfiguracion import ScreenConfiguracion
 
 '''
 Nota importante: saber que para el caso de las cuentas quincenales, los ingresos y egresos si significan su valor literal
@@ -20,7 +21,8 @@ MDNavigationLayout:
 		id:manager
 		ScreenGastos:
 		ScreenFondo:
-		ScreenConcubinos
+		ScreenConcubinos:
+		ScreenConfiguracion:
 	MDNavigationDrawer:
 		id:nav_drawer
 		radius:0,10,10,0
@@ -71,6 +73,20 @@ MDNavigationLayout:
 					nav_drawer.set_state('close')
 					manager.current='ScreenConcubinos'
 			MDFloatLayout:
+			MDRectangleFlatIconButton:
+				font_size:sp(20)
+				halign:'left'
+				size_hint_x:1
+				icon: "cog"
+				text: "Configuración"
+				theme_text_color: "Custom"
+				text_color: "black"
+				line_color: "white"
+				theme_icon_color: "Custom"
+				icon_color: "black"
+				on_release:
+					nav_drawer.set_state('close')
+					manager.current='ScreenConcubinos'
 '''
 
 
