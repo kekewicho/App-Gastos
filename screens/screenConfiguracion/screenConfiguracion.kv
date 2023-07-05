@@ -1,0 +1,14 @@
+ScreenConfiguracion:
+    MDBoxLayout:
+        padding:'15dp'
+        spacing:'20dp'
+        orientation:'vertical'
+        MDTopAppBar:
+            title: "Configuración"
+            anchor_title: "center"
+            left_action_items: [["menu", lambda x: app.root.ids.nav_drawer.set_state('open')]]
+            md_bg_bottom_color: rgba(0,0,0,0)
+        MDBoxLayout:
+            orientation:'vertical'
+            padding:0,'10dp',0,0
+            
