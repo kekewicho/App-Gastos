@@ -8,6 +8,8 @@ from screens.screenGastos.screenGastos import ScreenGastos
 from screens.screenFondo.screenFondo import ScreenFondo
 from screens.screenConcubinos.screenConcubinos import ScreenConcubinos
 from screens.screenConfiguracion.screenConfiguracion import ScreenConfiguracion
+from screens.screenFrecuentes.screenFrecuentes import ScreenFrecuentes
+from screens.screenAddFrecuentes.screenAddFrecuentes import ScreenAddFrecuentes
 
 '''
 Nota importante: saber que para el caso de las cuentas quincenales, los ingresos y egresos si significan su valor literal
@@ -23,6 +25,8 @@ MDNavigationLayout:
 		ScreenFondo:
 		ScreenConcubinos:
 		ScreenConfiguracion:
+        ScreenFrecuentes:
+        ScreenAddFrecuentes:
 	MDNavigationDrawer:
 		id:nav_drawer
 		radius:0,10,10,0
@@ -86,33 +90,28 @@ MDNavigationLayout:
 				icon_color: "black"
 				on_release:
 					nav_drawer.set_state('close')
-					manager.current='ScreenConcubinos'
+					manager.current='ScreenConfiguracion'
 '''
 
 
 class Appson(MDApp):
     data = DictProperty()
 
+    def navigateTo(self, screen:str):
+        self.manager.current=screen
+
     def build(self):
         self.data = {
-            'Ingreso': [
-				'cash-plus',
-				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registro('ingresos')
-				],
-            'Egreso': [
-				'cash-remove',
-				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registro('egresos')
-				],
-            'Gasto diferido':[
-				'credit-card-clock',
-				'on_release',lambda x:self.root.ids.manager.get_screen("ScreenGastos").registroDiferido()
-				],
+            'Ingreso': ['cash-plus', 'on_release', lambda x: self.root.ids.manager.get_screen("ScreenGastos").registro('ingresos')],
+            'Egreso': ['cash-remove', 'on_release', lambda x: self.root.ids.manager.get_screen("ScreenGastos").registro('egresos')],
+            'Gasto diferido': ['credit-card-clock', 'on_release', lambda x: self.root.ids.manager.get_screen("ScreenGastos").registroDiferido()],
         }
         return Builder.load_string(KV)
 
     def on_start(self):
-        Clock.schedule_once(lambda x: self.root.ids.manager.get_screen(
-            "ScreenGastos").ingre_egre_init_consulta(), 2)
+        self.manager=self.root.ids.manager
+        Clock.schedule_once(lambda x: self.root.ids.manager.get_screen("ScreenGastos").ingre_egre_init_consulta(), 2)
+
 
 
 if __name__ == "__main__":

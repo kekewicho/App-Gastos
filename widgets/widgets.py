@@ -11,19 +11,52 @@ from kivy.clock import Clock
 import crud
 import os
 
+class btnLongShortPress(TouchBehavior):
+    touch_down_time = 0
+    touch_up_time = 0
+    umbral = 0.7
 
-class GastoConcubinoItem(MDCard, TouchBehavior):
+    last_touch_id = None
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.touch_down_time = touch.time_start
+            self.event = Clock.schedule_once(self.long_touch, 1)
+            return super(btnLongShortPress, self).on_touch_down(touch)
+    
+    def on_touch_up(self, touch):
+        if self.last_touch_id == touch.uid:
+            return None
+        if self.collide_point(*touch.pos):
+            self.touch_up_time = touch.time_end
+            duration = self.touch_up_time - self.touch_down_time
+            if duration < self.umbral:
+                self.last_touch_id = touch.uid
+                self.event.cancel()
+                self.short_touch()
+                return super(btnLongShortPress, self).on_touch_up(touch)
+
+    def long_touch(self, *args):
+        self.on_long_press()
+
+    def short_touch(self, *args):
+        self.on_short_press()
+
+    def on_long_press(self):
+        # Implementa la lógica del log press en las subclases
+        pass
+
+    def on_short_press(self):
+        # Implementa la lógica del short press en las subclases
+        pass
+    
+
+class GastoConcubinoItem(btnLongShortPress, MDCard):
     quien = StringProperty()
     cantidad = NumericProperty()
     fecha = StringProperty()
     key = StringProperty()
     descripcion = StringProperty()
-
-    touch_down_time = 0
-    touch_up_time = 0
-    umbral = 0.7
-
-    last_touch_id=None
 
     def __init__(self, quien: str, cantidad: float, fecha: str, key: str, descripcion: str, *args):
         super().__init__(*args)
@@ -34,33 +67,17 @@ class GastoConcubinoItem(MDCard, TouchBehavior):
         self.descripcion = descripcion
 
     def update_info(self, data):
-        self.quien=str(data['quien']).capitalize()
-        self.cantidad=float(data['cantidad'])
-        self.fecha=str(data['fecha'])
-        self.descripcion=str(data['descripcion'])
+        self.quien = str(data['quien']).capitalize()
+        self.cantidad = float(data['cantidad'])
+        self.fecha = str(data['fecha'])
+        self.descripcion = str(data['descripcion'])
 
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            self.touch_down_time = touch.time_start
-            self.event=Clock.schedule_once(self.long_touch,1)
-            return super(GastoConcubinoItem,self).on_touch_down(touch)
-        
-    def long_touch(self,*args):
+    def on_long_press(self, *args):
         MDApp.get_running_app().root.ids.manager.get_screen('ScreenConcubinos').deleteItem(self)
     
-    def short_touch(self,*args):
+    def on_short_press(self, *args):
         MDApp.get_running_app().root.ids.manager.get_screen('ScreenConcubinos').updateItem(self)
 
-    def on_touch_up(self, touch):
-        if self.last_touch_id==touch.uid:return None
-        if self.collide_point(*touch.pos):
-            self.touch_up_time = touch.time_end
-            duration = self.touch_up_time - self.touch_down_time
-            if duration < self.umbral:
-                self.last_touch_id=touch.uid
-                self.event.cancel()
-                self.short_touch()
-                return super(GastoConcubinoItem,self).on_touch_up(touch)    
 
 class ConcubinosContent(MDBoxLayout):
     who = 'luis' if platform != 'macosx' else 'joss'
@@ -154,39 +171,19 @@ class ContentGastos(MDBoxLayout):
             self.setToday()
 
 
-class OPItem(MDCard, TouchBehavior):
+class OPItem(btnLongShortPress,MDCard):
     monto = StringProperty()
     descripcion = StringProperty()
     op = StringProperty()
     key = StringProperty()
     
-    touch_down_time = 0
-    touch_up_time = 0
-    umbral = 0.7
-    last_touch_id=None
-
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            self.touch_down_time = touch.time_start
-            self.event=Clock.schedule_once(self.long_touch,1)
-            return super(OPItem,self).on_touch_down(touch)
         
-    def long_touch(self,*args):
+    def on_long_press(self,*args):
         MDApp.get_running_app().root.ids.manager.get_screen('ScreenGastos').delete_opitem(self,self.key,self.op,self.monto)
     
-    def short_touch(self,*args):
+    def on_short_press(self,*args):
         MDApp.get_running_app().root.ids.manager.get_screen('ScreenGastos').edit_op(self.key,self.op,self)
 
-    def on_touch_up(self, touch):
-        if self.last_touch_id==touch.uid:return None
-        if self.collide_point(*touch.pos):
-            self.touch_up_time = touch.time_end
-            duration = self.touch_up_time - self.touch_down_time
-            if duration < self.umbral:
-                self.last_touch_id=touch.uid
-                self.event.cancel()
-                self.short_touch()
-                return super(OPItem,self).on_touch_up(touch)
 
 class DiferidoContent(MDBoxLayout):
     periodicidad=StringProperty('mensual')

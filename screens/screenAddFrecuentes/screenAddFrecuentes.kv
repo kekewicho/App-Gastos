@@ -1,0 +1,30 @@
+#:import TextFieldWIcon widgets.widgets
+
+<ScreenAddFrecuentes>:
+    name:'ScreenAddFrecuentes'
+    MDBoxLayout:
+        orientation:'vertical'
+        MDTopAppBar:
+            title: "Nueva operación"
+            anchor_title: "left"
+            left_action_items: [["arrow-left", lambda x: app.navigateTo('ScreenFrecuentes')]]
+            md_bg_color: "white"
+            elevation:0
+            specific_text_color: "black"
+        MDGridLayout:
+            cols:1
+            padding:"35dp","15dp","35dp",0
+            spacing:"15dp"
+            md_bg_color:"white"
+            TextFieldWIcon:
+                id:typeOp
+                hint_text:'Ingreso o egreso'
+            TextFieldWIcon:
+                hint_text:'Frecuencia'
+                id:frecuencia
+            MDTextField:
+                hint_text:'Monto'
+                id:monto
+            MDTextField:
+                hint_text:'Descripción'
+                id:descripcion

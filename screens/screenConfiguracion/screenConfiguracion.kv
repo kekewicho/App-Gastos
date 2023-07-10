@@ -1,14 +1,30 @@
-ScreenConfiguracion:
+<BtnConfig@MDRectangleFlatIconButton>:
+    font_size:sp(17)
+    halign:'left'
+    size_hint_x:1
+    theme_text_color: "Custom"
+    text_color: "black"
+    line_color: "white"
+    theme_icon_color: "Custom"
+    icon_color: "black"
+
+<ScreenConfiguracion>:
+    name:'ScreenConfiguracion'
     MDBoxLayout:
-        padding:'15dp'
-        spacing:'20dp'
         orientation:'vertical'
         MDTopAppBar:
             title: "Configuración"
-            anchor_title: "center"
+            anchor_title: "left"
             left_action_items: [["menu", lambda x: app.root.ids.nav_drawer.set_state('open')]]
-            md_bg_bottom_color: rgba(0,0,0,0)
+            md_bg_color: "white"
+            elevation:0
+            specific_text_color: "black"
         MDBoxLayout:
+            md_bg_color:"white"
             orientation:'vertical'
             padding:0,'10dp',0,0
-            
+            BtnConfig:
+                icon:'calendar-sync'
+                text:'Ingresos/egresos recurrentes'
+                on_release:app.manager.current="ScreenFrecuentes"
+            MDFloatLayout:

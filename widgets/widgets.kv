@@ -220,3 +220,22 @@
 	MDTextField:
 		hint_text:'¿A partir de que quincena?'
 		id:aPartir
+
+
+<TextFieldWIcon@RelativeLayout>:
+    size_hint_y: None
+    height: text_field.height
+	hint_text:''
+	text:''
+
+    MDTextField:
+        id: text_field
+        hint_text: root.hint_text
+		on_focus:
+			if self.focus:app.manager.get_screen("ScreenAddFrecuentes").showOpType()
+
+    MDIcon:
+        icon: "triangle-small-down"
+        pos_hint: {"center_y": .5}
+        pos: text_field.width - self.width -dp(8), 0
+        theme_text_color: "Hint"
